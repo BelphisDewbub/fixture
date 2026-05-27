@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Fixture
 
-## Getting Started
+Subscribe to sports teams and tournaments. Get automatic calendar invites for every game — in Google Calendar, Apple Calendar, Outlook, or any iCalendar-compatible app.
 
-First, run the development server:
+## How it works
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+1. Find your team or tournament on [fixture.app](https://fixture.app)
+2. Click **Subscribe** to get a live calendar feed URL
+3. Paste it into your calendar app once — games sync automatically
+
+Feed URLs follow the pattern:
+```
+webcal://fixture.app/cal/chicago-fire
+webcal://fixture.app/cal/world-cup-2026
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Events include the kickoff time (with timezone), venue, and where to stream.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Framework**: Next.js 15 (App Router) + TypeScript
+- **Styling**: Tailwind CSS
+- **Calendar feeds**: iCalendar (`.ics`) format via `ical-generator`
+- **Sports data**: football-data.org, TheSportsDB
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── app/
+│   ├── api/
+│   │   └── cal/[slug]/   # Live ICS feed endpoints
+│   └── ...               # Web frontend pages
+├── lib/
+│   ├── sports/           # Sports API clients + data normalization
+│   └── ics/              # ICS feed generation
+└── types/                # Shared TypeScript types
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Getting started
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm install
+npm run dev
+```
 
-## Deploy on Vercel
+Open [http://localhost:3000](http://localhost:3000).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Environment variables
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```env
+SPORTS_API_KEY=        # football-data.org API key
+SPORTSDB_API_KEY=      # TheSportsDB API key (optional, free tier available)
+```
