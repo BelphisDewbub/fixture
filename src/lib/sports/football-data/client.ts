@@ -10,7 +10,7 @@ export interface FDTeam {
 export interface FDMatch {
   id: number;
   utcDate: string;
-  status: "SCHEDULED" | "LIVE" | "IN_PLAY" | "PAUSED" | "FINISHED" | "POSTPONED" | "CANCELLED";
+  status: "TIMED" | "SCHEDULED" | "LIVE" | "IN_PLAY" | "PAUSED" | "FINISHED" | "POSTPONED" | "CANCELLED";
   stage: string;
   group: string | null;
   homeTeam: FDTeam;
