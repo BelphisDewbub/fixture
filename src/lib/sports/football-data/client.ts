@@ -27,8 +27,8 @@ export async function fetchCompetitionMatches(
   competitionCode: string,
   options: { status?: string } = {}
 ): Promise<FDMatch[]> {
-  const apiKey = process.env.SPORTS_API_KEY;
-  if (!apiKey) throw new Error("SPORTS_API_KEY is not set");
+  const apiKey = process.env.FOOTBALL_DATA_API_KEY;
+  if (!apiKey) throw new Error("FOOTBALL_DATA_API_KEY is not set");
 
   const url = new URL(`${BASE_URL}/competitions/${competitionCode}/matches`);
   if (options.status) url.searchParams.set("status", options.status);
