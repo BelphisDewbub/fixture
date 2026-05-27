@@ -11,13 +11,17 @@ export interface ESPNEvent {
   id: string;
   date: string; // UTC ISO e.g. "2026-05-28T22:40Z"
   name: string;
-  season: { year: number; displayName: string };
+  season: { year: number; displayName?: string; slug?: string };
   competitions: Array<{
     venue?: { fullName: string; address?: { city?: string; state?: string } };
     competitors: ESPNCompetitor[];
     broadcasts?: Array<{
-      type: { shortName: string }; // "TV" | "Streaming"
-      media: { shortName: string };
+      // team schedule format
+      type?: { shortName: string };
+      media?: { shortName: string };
+      // scoreboard format (soccer)
+      market?: string;
+      names?: string[];
     }>;
     status: { type: { name: string; completed: boolean } };
     links?: Array<{ rel: string[]; href: string }>;
@@ -25,6 +29,10 @@ export interface ESPNEvent {
 }
 
 interface ESPNScheduleResponse {
+  events: ESPNEvent[];
+}
+
+interface ESPNScoreboardResponse {
   events: ESPNEvent[];
 }
 
@@ -47,6 +55,24 @@ export async function fetchTeamSchedule(
   if (!res.ok) throw new Error(`ESPN error: ${res.status} — ${sport}/${league}/teams/${teamId}`);
 
   const data: ESPNScheduleResponse = await res.json();
+  return (data.events ?? []).filter(
+    (e) => !SKIP_STATUSES.has(e.competitions[0]?.status.type.name)
+  );
+}
+
+export async function fetchCompetitionScoreboard(
+  sport: string,
+  league: string,
+  dateRange: string // e.g. "20260611-20260719"
+): Promise<ESPNEvent[]> {
+  const res = await fetch(
+    `${BASE}/${sport}/${league}/scoreboard?dates=${dateRange}&limit=200`,
+    { next: { revalidate: 3600 } }
+  );
+
+  if (!res.ok) throw new Error(`ESPN error: ${res.status} — ${sport}/${league}/scoreboard`);
+
+  const data: ESPNScoreboardResponse = await res.json();
   return (data.events ?? []).filter(
     (e) => !SKIP_STATUSES.has(e.competitions[0]?.status.type.name)
   );

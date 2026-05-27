@@ -1,5 +1,5 @@
 import type { Game } from "@/types";
-import { getWorldCupGames } from "./football-data/world-cup";
+import { getWorldCupGames } from "./espn/world-cup";
 import { getMlbTeamGames, MLB_TEAMS } from "./espn/mlb";
 import { getNflTeamGames, NFL_TEAMS } from "./espn/nfl";
 import { getNbaTeamGames, NBA_TEAMS } from "./espn/nba";
