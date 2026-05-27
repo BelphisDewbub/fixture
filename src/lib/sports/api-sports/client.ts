@@ -8,39 +8,29 @@ const BASE_URLS: Record<Sport, string> = {
   hockey: "https://v1.hockey.api-sports.io",
 };
 
-export interface ASFixture {
-  fixture: {
-    id: number;
-    date: string;
-    venue: { id: number | null; name: string; city: string } | null;
-    status: { long: string; short: string; elapsed: number | null };
-  };
-  league: {
-    id: number;
-    name: string;
-    season: number;
-    round: string;
-  };
-  teams: {
-    home: { id: number; name: string; logo: string };
-    away: { id: number; name: string; logo: string };
-  };
-}
+// football uses /fixtures; all other sports use /games
+const ENDPOINTS: Record<Sport, string> = {
+  football: "fixtures",
+  basketball: "games",
+  "american-football": "games",
+  baseball: "games",
+  hockey: "games",
+};
 
-export interface ASFixturesResponse {
-  errors: unknown[];
+interface ASResponse<T> {
+  errors: unknown[] | Record<string, string>;
   results: number;
-  response: ASFixture[];
+  response: T[];
 }
 
-export async function fetchFixtures(
+export async function fetchGames<T>(
   sport: Sport,
   params: Record<string, string | number>
-): Promise<ASFixture[]> {
+): Promise<T[]> {
   const apiKey = process.env.API_SPORTS_KEY;
   if (!apiKey) throw new Error("API_SPORTS_KEY is not set");
 
-  const url = new URL(`${BASE_URLS[sport]}/fixtures`);
+  const url = new URL(`${BASE_URLS[sport]}/${ENDPOINTS[sport]}`);
   for (const [k, v] of Object.entries(params)) {
     url.searchParams.set(k, String(v));
   }
@@ -54,15 +44,12 @@ export async function fetchFixtures(
     throw new Error(`api-sports error: ${res.status} ${await res.text()}`);
   }
 
-  const data: ASFixturesResponse = await res.json();
+  const data: ASResponse<T> = await res.json();
 
-  if (Array.isArray(data.errors) && data.errors.length > 0) {
-    throw new Error(`api-sports error: ${JSON.stringify(data.errors)}`);
-  }
-
-  // api-sports returns errors as an object when the plan restricts access
-  if (data.errors && !Array.isArray(data.errors) && Object.keys(data.errors).length > 0) {
-    throw new Error(`api-sports error: ${JSON.stringify(data.errors)}`);
+  const errors = data.errors;
+  const hasErrors = Array.isArray(errors) ? errors.length > 0 : Object.keys(errors).length > 0;
+  if (hasErrors) {
+    throw new Error(`api-sports error: ${JSON.stringify(errors)}`);
   }
 
   return data.response;
