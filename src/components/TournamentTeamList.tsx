@@ -3,6 +3,40 @@
 import { useState, useEffect } from "react";
 import { slugifyTeamName } from "@/lib/sports";
 
+type Provider = "google" | "apple" | "outlook" | "other";
+
+const PROVIDERS: { id: Provider; label: string }[] = [
+  { id: "google", label: "Google Calendar" },
+  { id: "apple", label: "Apple Calendar" },
+  { id: "outlook", label: "Outlook" },
+  { id: "other", label: "Other app" },
+];
+
+function providerConfig(
+  provider: Provider,
+  feedUrl: string
+): { copyUrl: string; actionUrl: string | null; actionLabel: string | null } {
+  const webcalUrl = feedUrl.replace(/^https?/, "webcal");
+  switch (provider) {
+    case "google":
+      return {
+        copyUrl: feedUrl,
+        actionUrl: `https://www.google.com/calendar/render?cid=${encodeURIComponent(webcalUrl)}`,
+        actionLabel: "Open Google Calendar",
+      };
+    case "apple":
+      return { copyUrl: webcalUrl, actionUrl: webcalUrl, actionLabel: "Open Apple Calendar" };
+    case "outlook":
+      return {
+        copyUrl: feedUrl,
+        actionUrl: `https://outlook.live.com/calendar/0/addfromweb?url=${encodeURIComponent(feedUrl)}`,
+        actionLabel: "Open Outlook",
+      };
+    case "other":
+      return { copyUrl: feedUrl, actionUrl: null, actionLabel: null };
+  }
+}
+
 interface Props {
   tournamentSlug: string;
   teams: string[];
@@ -10,6 +44,7 @@ interface Props {
 
 export function TournamentTeamList({ tournamentSlug, teams }: Props) {
   const [openTeam, setOpenTeam] = useState<string | null>(null);
+  const [openProvider, setOpenProvider] = useState<Provider | null>(null);
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -17,96 +52,106 @@ export function TournamentTeamList({ tournamentSlug, teams }: Props) {
     setOrigin(window.location.origin);
   }, []);
 
-  function feedSlug(team: string) {
-    return `${tournamentSlug}--${slugifyTeamName(team)}`;
+  function feedUrl(team: string) {
+    return `${origin}/api/cal/${tournamentSlug}--${slugifyTeamName(team)}`;
   }
 
-  function webcalUrl(team: string) {
-    return `${origin}/api/cal/${feedSlug(team)}`.replace(/^https?/, "webcal");
-  }
-
-  function googleCalUrl(team: string) {
-    return `https://www.google.com/calendar/render?cid=${encodeURIComponent(webcalUrl(team))}`;
-  }
-
-  function outlookCalUrl(team: string) {
-    const url = `${origin}/api/cal/${feedSlug(team)}`;
-    return `https://outlook.live.com/calendar/0/addfromweb?url=${encodeURIComponent(url)}`;
-  }
-
-  async function copy(team: string) {
-    await navigator.clipboard.writeText(webcalUrl(team));
+  async function copy(team: string, provider: Provider) {
+    const cfg = providerConfig(provider, feedUrl(team));
+    await navigator.clipboard.writeText(cfg.copyUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
 
   function toggle(team: string) {
     setOpenTeam((prev) => (prev === team ? null : team));
+    setOpenProvider(null);
     setCopied(false);
   }
 
   return (
     <div className="rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 overflow-hidden shadow-sm">
       <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
-        {teams.map((team) => (
-          <li key={team}>
-            <div className="flex items-center gap-3 px-4 py-3">
-              <span className="flex-1 text-sm font-medium text-zinc-800 dark:text-zinc-200">{team}</span>
-              <button
-                onClick={() => toggle(team)}
-                className="shrink-0 rounded-lg bg-green-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-700 transition-colors"
-              >
-                {openTeam === team ? "Close" : "Subscribe"}
-              </button>
-            </div>
+        {teams.map((team) => {
+          const isOpen = openTeam === team;
+          const cfg = isOpen && openProvider && origin ? providerConfig(openProvider, feedUrl(team)) : null;
 
-            {openTeam === team && origin && (
-              <div className="mx-4 mb-3 space-y-3 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 p-4">
-                <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-                  Your calendar feed URL
-                </p>
-                <div className="flex items-center gap-2">
-                  <input
-                    readOnly
-                    value={webcalUrl(team)}
-                    className="min-w-0 flex-1 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-700 px-3 py-2 text-xs font-mono text-zinc-700 dark:text-zinc-300 focus:outline-none"
-                    onFocus={(e) => e.target.select()}
-                  />
-                  <button
-                    onClick={() => copy(team)}
-                    className="shrink-0 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-600 transition-colors"
-                  >
-                    {copied ? "Copied!" : "Copy"}
-                  </button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <a
-                    href={googleCalUrl(team)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-600 transition-colors"
-                  >
-                    Google Calendar
-                  </a>
-                  <a
-                    href={webcalUrl(team)}
-                    className="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-600 transition-colors"
-                  >
-                    Apple Calendar
-                  </a>
-                  <a
-                    href={outlookCalUrl(team)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-600 transition-colors"
-                  >
-                    Outlook
-                  </a>
-                </div>
+          return (
+            <li key={team}>
+              <div className="flex items-center gap-3 px-4 py-3">
+                <span className="flex-1 text-sm font-medium text-zinc-800 dark:text-zinc-200">{team}</span>
+                <button
+                  onClick={() => toggle(team)}
+                  className="shrink-0 rounded-lg bg-green-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-700 transition-colors"
+                >
+                  {isOpen ? "Close" : "Subscribe"}
+                </button>
               </div>
-            )}
-          </li>
-        ))}
+
+              {isOpen && origin && (
+                <div className="mx-4 mb-3 space-y-3 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 p-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                      {openProvider ? PROVIDERS.find((p) => p.id === openProvider)?.label : "Add to calendar"}
+                    </p>
+                    {openProvider && (
+                      <button
+                        onClick={() => { setOpenProvider(null); setCopied(false); }}
+                        className="text-xs text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+                      >
+                        Back
+                      </button>
+                    )}
+                  </div>
+
+                  {!openProvider ? (
+                    <div className="flex flex-col gap-2">
+                      {PROVIDERS.map((p) => (
+                        <button
+                          key={p.id}
+                          onClick={() => setOpenProvider(p.id)}
+                          className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-700 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-600 transition-colors text-left"
+                        >
+                          {p.label}
+                        </button>
+                      ))}
+                    </div>
+                  ) : cfg ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <input
+                          readOnly
+                          value={cfg.copyUrl}
+                          className="min-w-0 flex-1 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-700 px-3 py-2 text-xs font-mono text-zinc-700 dark:text-zinc-300 focus:outline-none"
+                          onFocus={(e) => e.target.select()}
+                        />
+                        <button
+                          onClick={() => copy(team, openProvider)}
+                          className="shrink-0 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-600 transition-colors"
+                        >
+                          {copied ? "Copied!" : "Copy"}
+                        </button>
+                      </div>
+                      <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                        Paste this URL into {PROVIDERS.find((p) => p.id === openProvider)?.label}&apos;s &ldquo;subscribe from web&rdquo; option.
+                      </p>
+                      {cfg.actionUrl && cfg.actionLabel && (
+                        <a
+                          href={cfg.actionUrl}
+                          target={openProvider === "apple" ? undefined : "_blank"}
+                          rel={openProvider === "apple" ? undefined : "noopener noreferrer"}
+                          className="block w-full rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-green-700 transition-colors text-center"
+                        >
+                          {cfg.actionLabel}
+                        </a>
+                      )}
+                    </div>
+                  ) : null}
+                </div>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
