@@ -33,7 +33,7 @@ export function TournamentTabs({ games, tournamentSlug, teams, groups, bracketRo
 
   return (
     <div>
-      <div className="flex gap-1 mb-6 border-b border-zinc-200 dark:border-zinc-700 overflow-x-auto">
+      <div className="flex gap-1 mb-6 border-b border-zinc-200 dark:border-zinc-700 overflow-x-auto overflow-y-hidden">
         {tabs
           .filter((t) => t.visible)
           .map((t) => (
