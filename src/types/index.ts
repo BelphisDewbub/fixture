@@ -18,9 +18,14 @@ export interface Game {
   id: string;
   homeTeam: string;
   awayTeam: string;
+  homeScore?: string;
+  awayScore?: string;
+  completed?: boolean;
   kickoff: Date;
   venue?: string;
   competition: string;
+  stage?: string;   // ESPN season.slug: "group-stage", "round-of-16", "quarterfinals", etc.
+  group?: string;   // group letter: "A", "B", etc. (group stage only)
   broadcastInfo?: BroadcastInfo;
 }
 

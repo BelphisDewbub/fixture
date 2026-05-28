@@ -33,12 +33,30 @@ export interface ESPNEvent {
   }>;
 }
 
+export interface ESPNStandingsEntry {
+  team: { id: string; displayName: string };
+  stats?: Array<{ name: string; value: number; displayValue: string }>;
+}
+
+export interface ESPNGroup {
+  groupId?: string | number;
+  name: string;
+  events?: Array<string | { id: string }>;
+  entries?: ESPNStandingsEntry[];
+}
+
+export interface ESPNScoreboardResult {
+  events: ESPNEvent[];
+  groups: ESPNGroup[];
+}
+
 interface ESPNScheduleResponse {
   events: ESPNEvent[];
 }
 
 interface ESPNScoreboardResponse {
   events: ESPNEvent[];
+  groups?: ESPNGroup[];
 }
 
 const SKIP_STATUSES = new Set([
@@ -69,7 +87,7 @@ export async function fetchCompetitionScoreboard(
   sport: string,
   league: string,
   dateRange: string // e.g. "20260611-20260719"
-): Promise<ESPNEvent[]> {
+): Promise<ESPNScoreboardResult> {
   const res = await fetch(
     `${BASE}/${sport}/${league}/scoreboard?dates=${dateRange}&limit=200`,
     { next: { revalidate: 3600 } }
@@ -78,9 +96,10 @@ export async function fetchCompetitionScoreboard(
   if (!res.ok) throw new Error(`ESPN error: ${res.status} — ${sport}/${league}/scoreboard`);
 
   const data: ESPNScoreboardResponse = await res.json();
-  return (data.events ?? []).filter(
+  const events = (data.events ?? []).filter(
     (e) => !SKIP_STATUSES.has(e.competitions[0]?.status.type.name)
   );
+  return { events, groups: data.groups ?? [] };
 }
 
 export async function fetchLiveForTeam(

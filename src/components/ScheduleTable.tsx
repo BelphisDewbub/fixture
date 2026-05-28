@@ -7,9 +7,14 @@ export interface SerializedGame {
   id: string;
   homeTeam: string;
   awayTeam: string;
+  homeScore?: string;
+  awayScore?: string;
+  completed?: boolean;
   kickoff: string; // ISO 8601
   venue?: string;
   competition: string;
+  stage?: string;
+  group?: string;
   broadcastInfo?: BroadcastInfo;
 }
 

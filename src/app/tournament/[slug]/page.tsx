@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getWorldCupGames } from "@/lib/sports/espn/world-cup";
 import { ACTIVE_STATUSES } from "@/lib/sports/resolve";
+import { buildTournamentStructure } from "@/lib/tournament/structure";
 import { LiveGameBanner } from "@/components/LiveGameBanner";
 import { SubscribeStrip } from "@/components/SubscribeStrip";
 import { TournamentTabs } from "@/components/TournamentTabs";
@@ -81,11 +82,18 @@ export default async function TournamentPage({ params }: Props) {
     id: g.id,
     homeTeam: g.homeTeam,
     awayTeam: g.awayTeam,
+    homeScore: g.homeScore,
+    awayScore: g.awayScore,
+    completed: g.completed,
     kickoff: g.kickoff.toISOString(),
     venue: g.venue,
     competition: g.competition,
+    stage: g.stage,
+    group: g.group,
     broadcastInfo: g.broadcastInfo,
   }));
+
+  const { groups, bracketRounds } = buildTournamentStructure(serialized);
 
   return (
     <div className="min-h-screen bg-zinc-50 font-sans">
@@ -127,7 +135,13 @@ export default async function TournamentPage({ params }: Props) {
           initial={{ hasLive: isLive, game: liveGame }}
         />
 
-        <TournamentTabs games={serialized} tournamentSlug={slug} teams={teamNames} />
+        <TournamentTabs
+          games={serialized}
+          tournamentSlug={slug}
+          teams={teamNames}
+          groups={groups}
+          bracketRounds={bracketRounds}
+        />
       </main>
       <Footer />
     </div>
