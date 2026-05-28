@@ -3,7 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { resolveTeamSlug, ACTIVE_STATUSES } from "@/lib/sports/resolve";
 import { getGamesBySlug } from "@/lib/sports";
-import { fetchLiveForTeam } from "@/lib/sports/espn/client";
+import { fetchLiveForTeam, type ESPNCompetitor } from "@/lib/sports/espn/client";
+
+const scoreStr = (s: ESPNCompetitor["score"]) =>
+  typeof s === "object" && s !== null ? s.displayValue : (s ?? "0");
 import { LiveGameBanner } from "@/components/LiveGameBanner";
 import { ScheduleTable, type SerializedGame } from "@/components/ScheduleTable";
 import { SubscribeStrip } from "@/components/SubscribeStrip";
@@ -35,8 +38,8 @@ export default async function TeamPage({ params }: Props) {
     ? {
         homeTeam: comp.competitors.find((c) => c.homeAway === "home")?.team.displayName ?? "Home",
         awayTeam: comp.competitors.find((c) => c.homeAway === "away")?.team.displayName ?? "Away",
-        homeScore: comp.competitors.find((c) => c.homeAway === "home")?.score ?? "0",
-        awayScore: comp.competitors.find((c) => c.homeAway === "away")?.score ?? "0",
+        homeScore: scoreStr(comp.competitors.find((c) => c.homeAway === "home")?.score),
+        awayScore: scoreStr(comp.competitors.find((c) => c.homeAway === "away")?.score),
         statusText: comp.status.type.shortDetail ?? comp.status.type.description ?? "Live",
         venue: comp.venue?.fullName,
       }
