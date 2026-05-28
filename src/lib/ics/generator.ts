@@ -13,6 +13,8 @@ export function generateIcsFeed(games: Game[], calendarName: string): string {
     "X-PUBLISHED-TTL:PT6H",
   ];
 
+  const dtstamp = formatIcsDate(new Date());
+
   for (const game of games) {
     const uid = `${game.id}@fixture.app`;
     const dtstart = formatIcsDate(game.kickoff);
@@ -20,20 +22,30 @@ export function generateIcsFeed(games: Game[], calendarName: string): string {
     const summary = `${game.awayTeam} @ ${game.homeTeam}`;
     const description = buildDescription(game);
 
-    lines.push(
-      "BEGIN:VEVENT",
-      `UID:${uid}`,
-      `DTSTART:${dtstart}`,
-      `DTEND:${dtend}`,
-      `SUMMARY:${escapeIcs(summary)}`,
-      `DESCRIPTION:${escapeIcs(description)}`,
-      game.venue ? `LOCATION:${escapeIcs(game.venue)}` : "",
-      "END:VEVENT"
-    );
+    lines.push("BEGIN:VEVENT");
+    lines.push(`UID:${uid}`);
+    lines.push(`DTSTAMP:${dtstamp}`);
+    lines.push(`DTSTART:${dtstart}`);
+    lines.push(`DTEND:${dtend}`);
+    lines.push(...fold(`SUMMARY:${escapeIcs(summary)}`));
+    lines.push(...fold(`DESCRIPTION:${escapeIcs(description)}`));
+    if (game.venue) lines.push(...fold(`LOCATION:${escapeIcs(game.venue)}`));
+    lines.push("END:VEVENT");
   }
 
   lines.push("END:VCALENDAR");
-  return lines.filter(Boolean).join("\r\n");
+  return lines.join("\r\n") + "\r\n";
+}
+
+// RFC 5545 §3.1: fold lines longer than 75 octets
+function fold(line: string): string[] {
+  const out: string[] = [];
+  while (line.length > 75) {
+    out.push(line.slice(0, 75));
+    line = " " + line.slice(75);
+  }
+  out.push(line);
+  return out;
 }
 
 function formatIcsDate(date: Date): string {
@@ -41,7 +53,11 @@ function formatIcsDate(date: Date): string {
 }
 
 function escapeIcs(value: string): string {
-  return value.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\n/g, "\\n");
 }
 
 function buildDescription(game: Game): string {
