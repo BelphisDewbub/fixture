@@ -32,6 +32,7 @@ interface TeamSection {
   logoUrl: string;
   prefix: string;
   teams: TeamEntry[];
+  sport: string;
 }
 
 type Section = TournamentSection | TeamSection;
@@ -41,16 +42,51 @@ interface Props {
 }
 
 export function LeagueBrowser({ sections }: Props) {
+  const [activeSport, setActiveSport] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  const visible = activeId ? sections.filter((s) => s.id === activeId) : sections;
+  const sports = Array.from(new Set(sections.map((s) => s.sport))).sort();
+  const sportFiltered = activeSport ? sections.filter((s) => s.sport === activeSport) : sections;
+  const visible = activeId ? sportFiltered.filter((s) => s.id === activeId) : sportFiltered;
+
+  function selectSport(sport: string | null) {
+    setActiveSport(sport);
+    setActiveId(null);
+  }
 
   function toggle(id: string) {
     setActiveId((prev) => (prev === id ? null : id));
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
+      {/* Sport filter */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={() => selectSport(null)}
+          className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+            activeSport === null
+              ? "bg-zinc-900 text-white"
+              : "bg-white border border-zinc-200 text-zinc-500 hover:bg-zinc-50"
+          }`}
+        >
+          All Sports
+        </button>
+        {sports.map((sport) => (
+          <button
+            key={sport}
+            onClick={() => selectSport(sport)}
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+              activeSport === sport
+                ? "bg-zinc-900 text-white"
+                : "bg-white border border-zinc-200 text-zinc-500 hover:bg-zinc-50"
+            }`}
+          >
+            {sport}
+          </button>
+        ))}
+      </div>
+
       {/* Horizontal league picker */}
       <div className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <div className="flex gap-3 pb-1 min-w-max">
@@ -65,7 +101,7 @@ export function LeagueBrowser({ sections }: Props) {
             All
           </button>
 
-          {sections.map((s) => (
+          {sportFiltered.map((s) => (
             <button
               key={s.id}
               onClick={() => toggle(s.id)}
@@ -92,7 +128,7 @@ export function LeagueBrowser({ sections }: Props) {
       </div>
 
       {/* Content sections */}
-      <div className="space-y-12">
+      <div className="space-y-12 mt-4">
         {visible.map((s) => {
           if (s.type === "tournament") {
             return (
