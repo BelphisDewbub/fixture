@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { LeagueBrowser } from "@/components/LeagueBrowser";
+import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { MLB_TEAMS } from "@/lib/sports/espn/mlb";
 import { NFL_TEAMS } from "@/lib/sports/espn/nfl";
 import { NBA_TEAMS } from "@/lib/sports/espn/nba";
@@ -127,23 +128,26 @@ const SECTIONS = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 font-sans">
       {/* Header */}
-      <header className="border-b border-zinc-200 bg-white">
+      <header className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800">
         <div className="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between">
-          <span className="text-xl font-bold tracking-tight text-zinc-900">Fixture</span>
-          <span className="text-sm text-zinc-400 hidden sm:block">
-            Sports schedules, straight to your calendar
-          </span>
+          <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Fixture</span>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-zinc-400 dark:text-zinc-500 hidden sm:block">
+              Sports schedules, straight to your calendar
+            </span>
+            <DarkModeToggle />
+          </div>
         </div>
       </header>
 
       {/* Hero */}
       <section className="mx-auto max-w-4xl px-6 py-16 text-center">
-        <h1 className="text-4xl font-bold tracking-tight text-zinc-900 sm:text-5xl">
+        <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
           Never miss a game.
         </h1>
-        <p className="mt-4 text-lg text-zinc-500 max-w-xl mx-auto">
+        <p className="mt-4 text-lg text-zinc-500 dark:text-zinc-400 max-w-xl mx-auto">
           Subscribe to any team or tournament. Every match lands in your calendar
           automatically — with kickoff times, venues, and where to stream.
         </p>
@@ -157,22 +161,22 @@ export default function Home() {
             { step: "2", label: "Click Subscribe to get your feed URL" },
             { step: "3", label: "Paste it once — games sync automatically" },
           ].map(({ step, label }) => (
-            <div key={step} className="flex items-center gap-3 rounded-xl bg-white border border-zinc-200 px-5 py-4">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-100 text-sm font-bold text-green-700">
+            <div key={step} className="flex items-center gap-3 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-5 py-4">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40 text-sm font-bold text-green-700 dark:text-green-400">
                 {step}
               </span>
-              <span className="text-sm text-zinc-700">{label}</span>
+              <span className="text-sm text-zinc-700 dark:text-zinc-300">{label}</span>
             </div>
           ))}
           <Link
             href="/how-to-add"
-            className="flex items-center gap-3 rounded-xl bg-white border border-zinc-200 px-5 py-4 hover:border-zinc-300 hover:bg-zinc-50 transition-colors group"
+            className="flex items-center gap-3 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-5 py-4 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors group"
           >
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-sm font-bold text-zinc-500">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-700 text-sm font-bold text-zinc-500 dark:text-zinc-400">
               ?
             </span>
-            <span className="text-sm text-zinc-700 flex-1">Not sure how to add it? Step-by-step guides</span>
-            <span className="text-zinc-300 group-hover:text-zinc-500 transition-colors text-sm">→</span>
+            <span className="text-sm text-zinc-700 dark:text-zinc-300 flex-1">Not sure how to add it? Step-by-step guides</span>
+            <span className="text-zinc-300 dark:text-zinc-600 group-hover:text-zinc-500 dark:group-hover:text-zinc-400 transition-colors text-sm">→</span>
           </Link>
         </div>
       </section>

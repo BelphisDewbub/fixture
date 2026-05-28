@@ -14,35 +14,35 @@ const TABS: { id: Tab; label: string }[] = [
 function Step({ n, children }: { n: number; children: React.ReactNode }) {
   return (
     <div className="flex gap-4">
-      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-100 text-sm font-bold text-green-700 mt-0.5">
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40 text-sm font-bold text-green-700 dark:text-green-400 mt-0.5">
         {n}
       </span>
-      <p className="text-sm text-zinc-700 leading-relaxed">{children}</p>
+      <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">{children}</p>
     </div>
   );
 }
 
 function Note({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
-      <span className="text-amber-500 text-base shrink-0">⚠</span>
-      <p className="text-sm text-amber-800 leading-relaxed">{children}</p>
+    <div className="flex gap-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-4 py-3">
+      <span className="text-amber-500 dark:text-amber-400 text-base shrink-0">⚠</span>
+      <p className="text-sm text-amber-800 dark:text-amber-300 leading-relaxed">{children}</p>
     </div>
   );
 }
 
 function Tip({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex gap-3 rounded-xl bg-blue-50 border border-blue-100 px-4 py-3">
+    <div className="flex gap-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 px-4 py-3">
       <span className="text-blue-400 text-base shrink-0">💡</span>
-      <p className="text-sm text-blue-800 leading-relaxed">{children}</p>
+      <p className="text-sm text-blue-800 dark:text-blue-300 leading-relaxed">{children}</p>
     </div>
   );
 }
 
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">
+    <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-3">
       {children}
     </h3>
   );
@@ -56,23 +56,23 @@ function GoogleTab() {
         <div className="space-y-3">
           <Step n={1}>
             Go to{" "}
-            <strong className="font-semibold text-zinc-900">calendar.google.com</strong>{" "}
+            <strong className="font-semibold text-zinc-900 dark:text-zinc-100">calendar.google.com</strong>{" "}
             in your browser and sign in.
           </Step>
           <Step n={2}>
-            In the left sidebar, find <strong className="font-semibold text-zinc-900">Other calendars</strong> and
-            click the <strong className="font-semibold text-zinc-900">+</strong> button next to it.
+            In the left sidebar, find <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Other calendars</strong> and
+            click the <strong className="font-semibold text-zinc-900 dark:text-zinc-100">+</strong> button next to it.
           </Step>
           <Step n={3}>
-            Select <strong className="font-semibold text-zinc-900">From URL</strong>.
+            Select <strong className="font-semibold text-zinc-900 dark:text-zinc-100">From URL</strong>.
           </Step>
           <Step n={4}>
             Paste your Fixture feed URL into the box and click{" "}
-            <strong className="font-semibold text-zinc-900">Add calendar</strong>.
+            <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Add calendar</strong>.
           </Step>
         </div>
         <Tip>
-          Your feed URL starts with <code className="font-mono bg-zinc-100 px-1 rounded text-xs">webcal://</code> — paste it exactly as copied from Fixture.
+          Your feed URL starts with <code className="font-mono bg-zinc-100 dark:bg-zinc-800 px-1 rounded text-xs">webcal://</code> — paste it exactly as copied from Fixture.
         </Tip>
       </div>
 
@@ -90,12 +90,12 @@ function GoogleTab() {
           </Step>
           <Step n={2}>
             Open the Google Calendar app and tap the{" "}
-            <strong className="font-semibold text-zinc-900">☰ menu</strong> in the
+            <strong className="font-semibold text-zinc-900 dark:text-zinc-100">☰ menu</strong> in the
             top-left corner.
           </Step>
           <Step n={3}>
             Scroll down to find your new Fixture calendar listed under{" "}
-            <strong className="font-semibold text-zinc-900">Other calendars</strong>.
+            <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Other calendars</strong>.
             Tap it to make sure it&apos;s checked.
           </Step>
           <Step n={4}>
@@ -118,27 +118,27 @@ function AppleTab() {
             Copy your Fixture feed URL from the Subscribe button.
           </Step>
           <Step n={2}>
-            Open the <strong className="font-semibold text-zinc-900">Settings</strong> app,
-            scroll down and tap <strong className="font-semibold text-zinc-900">Calendar</strong>.
+            Open the <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Settings</strong> app,
+            scroll down and tap <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Calendar</strong>.
           </Step>
           <Step n={3}>
-            Tap <strong className="font-semibold text-zinc-900">Accounts</strong> →{" "}
-            <strong className="font-semibold text-zinc-900">Add Account</strong> →{" "}
-            <strong className="font-semibold text-zinc-900">Other</strong>.
+            Tap <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Accounts</strong> →{" "}
+            <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Add Account</strong> →{" "}
+            <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Other</strong>.
           </Step>
           <Step n={4}>
-            Tap <strong className="font-semibold text-zinc-900">Add Subscribed Calendar</strong>,
-            paste your URL, and tap <strong className="font-semibold text-zinc-900">Next</strong>.
+            Tap <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Add Subscribed Calendar</strong>,
+            paste your URL, and tap <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Next</strong>.
           </Step>
           <Step n={5}>
-            Tap <strong className="font-semibold text-zinc-900">Save</strong>. Games
+            Tap <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Save</strong>. Games
             will now appear in your Calendar app.
           </Step>
         </div>
         <Tip>
-          Alternatively, tap the <strong className="font-semibold text-zinc-900">Apple Calendar</strong> button
+          Alternatively, tap the <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Apple Calendar</strong> button
           in the Subscribe panel — if your phone asks to open it in Calendar, just tap{" "}
-          <strong className="font-semibold text-zinc-900">Subscribe</strong>.
+          <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Subscribe</strong>.
         </Tip>
       </div>
 
@@ -146,24 +146,24 @@ function AppleTab() {
         <SectionHeading>On a Mac</SectionHeading>
         <div className="space-y-3">
           <Step n={1}>
-            Open the <strong className="font-semibold text-zinc-900">Calendar</strong> app.
+            Open the <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Calendar</strong> app.
           </Step>
           <Step n={2}>
             In the menu bar, click{" "}
-            <strong className="font-semibold text-zinc-900">File</strong> →{" "}
-            <strong className="font-semibold text-zinc-900">New Calendar Subscription…</strong>
+            <strong className="font-semibold text-zinc-900 dark:text-zinc-100">File</strong> →{" "}
+            <strong className="font-semibold text-zinc-900 dark:text-zinc-100">New Calendar Subscription…</strong>
           </Step>
           <Step n={3}>
             Paste your feed URL and click{" "}
-            <strong className="font-semibold text-zinc-900">Subscribe</strong>.
+            <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Subscribe</strong>.
           </Step>
           <Step n={4}>
             Choose how often to refresh (every hour is fine) and click{" "}
-            <strong className="font-semibold text-zinc-900">OK</strong>.
+            <strong className="font-semibold text-zinc-900 dark:text-zinc-100">OK</strong>.
           </Step>
         </div>
         <Tip>
-          Enable <strong className="font-semibold text-zinc-900">iCloud</strong> sync on that screen to
+          Enable <strong className="font-semibold text-zinc-900 dark:text-zinc-100">iCloud</strong> sync on that screen to
           have the calendar appear on all your Apple devices automatically.
         </Tip>
       </div>
@@ -178,19 +178,19 @@ function OutlookTab() {
         <SectionHeading>Outlook on the web (Outlook.com or Microsoft 365)</SectionHeading>
         <div className="space-y-3">
           <Step n={1}>
-            Go to <strong className="font-semibold text-zinc-900">outlook.live.com</strong> or
+            Go to <strong className="font-semibold text-zinc-900 dark:text-zinc-100">outlook.live.com</strong> or
             your Microsoft 365 calendar and sign in.
           </Step>
           <Step n={2}>
-            Click <strong className="font-semibold text-zinc-900">Add calendar</strong> in
+            Click <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Add calendar</strong> in
             the left sidebar.
           </Step>
           <Step n={3}>
-            Select <strong className="font-semibold text-zinc-900">Subscribe from web</strong>.
+            Select <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Subscribe from web</strong>.
           </Step>
           <Step n={4}>
             Paste your feed URL and give the calendar a name, then click{" "}
-            <strong className="font-semibold text-zinc-900">Import</strong>.
+            <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Import</strong>.
           </Step>
         </div>
       </div>
@@ -200,24 +200,24 @@ function OutlookTab() {
         <div className="space-y-3">
           <Step n={1}>
             Open Outlook and switch to the{" "}
-            <strong className="font-semibold text-zinc-900">Calendar</strong> view.
+            <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Calendar</strong> view.
           </Step>
           <Step n={2}>
             In the ribbon at the top, click{" "}
-            <strong className="font-semibold text-zinc-900">Open Calendar</strong> →{" "}
-            <strong className="font-semibold text-zinc-900">From Internet…</strong>
+            <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Open Calendar</strong> →{" "}
+            <strong className="font-semibold text-zinc-900 dark:text-zinc-100">From Internet…</strong>
           </Step>
           <Step n={3}>
             Paste your feed URL and click{" "}
-            <strong className="font-semibold text-zinc-900">OK</strong>, then{" "}
-            <strong className="font-semibold text-zinc-900">Yes</strong> when asked
+            <strong className="font-semibold text-zinc-900 dark:text-zinc-100">OK</strong>, then{" "}
+            <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Yes</strong> when asked
             to add it.
           </Step>
         </div>
         <Note>
           In newer versions of the Outlook desktop app, the menu may say{" "}
-          <strong className="font-semibold text-zinc-900">Add calendar</strong> instead
-          of <strong className="font-semibold text-zinc-900">Open Calendar</strong>. Look
+          <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Add calendar</strong> instead
+          of <strong className="font-semibold text-zinc-900 dark:text-zinc-100">Open Calendar</strong>. Look
           for a similar &quot;From internet / From URL&quot; option.
         </Note>
       </div>
@@ -228,9 +228,9 @@ function OutlookTab() {
 function OtherTab() {
   return (
     <div className="space-y-6">
-      <p className="text-sm text-zinc-600 leading-relaxed">
-        Any calendar app that supports <strong className="font-semibold text-zinc-900">ICS subscriptions</strong> or{" "}
-        <strong className="font-semibold text-zinc-900">webcal:// URLs</strong> will work with Fixture. Look for
+      <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+        Any calendar app that supports <strong className="font-semibold text-zinc-900 dark:text-zinc-100">ICS subscriptions</strong> or{" "}
+        <strong className="font-semibold text-zinc-900 dark:text-zinc-100">webcal:// URLs</strong> will work with Fixture. Look for
         an option like:
       </p>
       <ul className="space-y-2">
@@ -241,7 +241,7 @@ function OtherTab() {
           "Add ICS feed",
           "Add webcal subscription",
         ].map((label) => (
-          <li key={label} className="flex items-center gap-2 text-sm text-zinc-700">
+          <li key={label} className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
             <span className="text-green-500 font-bold">✓</span>
             {label}
           </li>
@@ -249,13 +249,13 @@ function OtherTab() {
       </ul>
       <Tip>
         When asked for a URL, paste your Fixture feed URL exactly as shown — it starts
-        with <code className="font-mono bg-zinc-100 px-1 rounded text-xs">webcal://</code>.
+        with <code className="font-mono bg-zinc-100 dark:bg-zinc-800 px-1 rounded text-xs">webcal://</code>.
         Some apps may also accept it starting with{" "}
-        <code className="font-mono bg-zinc-100 px-1 rounded text-xs">https://</code> if webcal
+        <code className="font-mono bg-zinc-100 dark:bg-zinc-800 px-1 rounded text-xs">https://</code> if webcal
         doesn&apos;t work.
       </Tip>
-      <div className="rounded-2xl border border-zinc-200 bg-white p-5 space-y-2">
-        <p className="text-sm font-semibold text-zinc-800">Popular apps that work</p>
+      <div className="rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5 space-y-2">
+        <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Popular apps that work</p>
         <div className="flex flex-wrap gap-2">
           {[
             "Fantastical",
@@ -268,7 +268,7 @@ function OtherTab() {
           ].map((app) => (
             <span
               key={app}
-              className="rounded-full bg-zinc-100 px-3 py-1 text-xs text-zinc-600"
+              className="rounded-full bg-zinc-100 dark:bg-zinc-700 px-3 py-1 text-xs text-zinc-600 dark:text-zinc-400"
             >
               {app}
             </span>
@@ -292,15 +292,15 @@ export function CalendarGuide() {
   return (
     <div>
       {/* Tab bar */}
-      <div className="flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b border-zinc-200 mb-8">
+      <div className="flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b border-zinc-200 dark:border-zinc-700 mb-8">
         {TABS.map(({ id, label }) => (
           <button
             key={id}
             onClick={() => setActive(id)}
             className={`shrink-0 px-4 py-2.5 text-sm font-semibold transition-colors border-b-2 -mb-px ${
               active === id
-                ? "border-green-600 text-green-700"
-                : "border-transparent text-zinc-500 hover:text-zinc-700"
+                ? "border-green-600 text-green-700 dark:text-green-400"
+                : "border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
             }`}
           >
             {label}

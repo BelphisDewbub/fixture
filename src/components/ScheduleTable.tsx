@@ -44,27 +44,27 @@ function GameRow({ game, muted }: { game: SerializedGame; muted?: boolean }) {
 
   return (
     <tr
-      className={`border-b border-zinc-100 last:border-0 transition-opacity ${
+      className={`border-b border-zinc-100 dark:border-zinc-800 last:border-0 transition-opacity ${
         muted ? "opacity-40" : ""
       }`}
     >
       <td className="py-3 px-4">
-        <p className="text-sm font-medium text-zinc-800">
+        <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
           {game.awayTeam}{" "}
-          <span className="text-zinc-400 font-normal text-xs">at</span>{" "}
+          <span className="text-zinc-400 dark:text-zinc-500 font-normal text-xs">at</span>{" "}
           {game.homeTeam}
         </p>
         {game.venue && (
-          <p className="text-xs text-zinc-400 mt-0.5">{game.venue}</p>
+          <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">{game.venue}</p>
         )}
       </td>
       <td className="py-3 px-4 text-right whitespace-nowrap">
-        <p className="text-sm text-zinc-700">{fmtDate(game.kickoff)}</p>
-        <p className="text-xs text-zinc-400">{fmtTime(game.kickoff)}</p>
+        <p className="text-sm text-zinc-700 dark:text-zinc-300">{fmtDate(game.kickoff)}</p>
+        <p className="text-xs text-zinc-400 dark:text-zinc-500">{fmtTime(game.kickoff)}</p>
       </td>
       <td className="py-3 px-4 hidden sm:table-cell text-right">
         {broadcasts && (
-          <span className="text-xs text-zinc-400">{broadcasts}</span>
+          <span className="text-xs text-zinc-400 dark:text-zinc-500">{broadcasts}</span>
         )}
       </td>
     </tr>
@@ -86,7 +86,7 @@ export function ScheduleTable({ games }: Props) {
 
   if (upcoming.length === 0 && past.length === 0) {
     return (
-      <p className="text-sm text-zinc-400 text-center py-12">
+      <p className="text-sm text-zinc-400 dark:text-zinc-500 text-center py-12">
         No games scheduled.
       </p>
     );
@@ -96,10 +96,10 @@ export function ScheduleTable({ games }: Props) {
     <div className="space-y-8">
       {upcoming.length > 0 && (
         <section>
-          <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-3">
             Upcoming
           </h3>
-          <div className="rounded-2xl border border-zinc-200 bg-white overflow-hidden shadow-sm">
+          <div className="rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 overflow-hidden shadow-sm">
             <table className="w-full text-left">
               <tbody>
                 {upcoming.map((g) => (
@@ -113,10 +113,10 @@ export function ScheduleTable({ games }: Props) {
 
       {past.length > 0 && (
         <section>
-          <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">
+          <h3 className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-3">
             Past
           </h3>
-          <div className="rounded-2xl border border-zinc-200 bg-white overflow-hidden shadow-sm">
+          <div className="rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 overflow-hidden shadow-sm">
             <table className="w-full text-left">
               <tbody>
                 {visiblePast.map((g) => (
@@ -128,7 +128,7 @@ export function ScheduleTable({ games }: Props) {
           {past.length > 5 && !showAllPast && (
             <button
               onClick={() => setShowAllPast(true)}
-              className="mt-3 text-sm text-zinc-500 hover:text-zinc-700 transition-colors"
+              className="mt-3 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
             >
               Show {past.length - 5} more past{" "}
               {past.length - 5 === 1 ? "game" : "games"}

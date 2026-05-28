@@ -71,8 +71,8 @@ export function LeagueBrowser({ sections }: Props) {
           onClick={() => selectSport(null)}
           className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
             activeSport === null
-              ? "bg-zinc-900 text-white"
-              : "bg-white border border-zinc-200 text-zinc-500 hover:bg-zinc-50"
+              ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900"
+              : "bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700"
           }`}
         >
           All Sports
@@ -83,8 +83,8 @@ export function LeagueBrowser({ sections }: Props) {
             onClick={() => selectSport(sport)}
             className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
               activeSport === sport
-                ? "bg-zinc-900 text-white"
-                : "bg-white border border-zinc-200 text-zinc-500 hover:bg-zinc-50"
+                ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900"
+                : "bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700"
             }`}
           >
             {sport}
@@ -96,7 +96,7 @@ export function LeagueBrowser({ sections }: Props) {
       <div className="flex items-center gap-1">
         <button
           onClick={() => scrollLeagues("left")}
-          className="hidden md:flex shrink-0 items-center justify-center w-7 h-8 rounded text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
+          className="hidden md:flex shrink-0 items-center justify-center w-7 h-8 rounded text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
           aria-label="Scroll left"
         >
           ‹
@@ -107,8 +107,8 @@ export function LeagueBrowser({ sections }: Props) {
             onClick={() => setActiveId(null)}
             className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
               activeId === null
-                ? "bg-zinc-900 text-white"
-                : "bg-white border border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+                ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900"
+                : "bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700"
             }`}
           >
             All
@@ -120,11 +120,11 @@ export function LeagueBrowser({ sections }: Props) {
               onClick={() => toggle(s.id)}
               className={`flex items-center gap-2.5 shrink-0 rounded-full pl-2 pr-4 py-2 text-sm font-semibold transition-colors ${
                 activeId === s.id
-                  ? "bg-zinc-900 text-white"
-                  : "bg-white border border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+                  ? "bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900"
+                  : "bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700"
               }`}
             >
-              <span className="flex w-7 h-7 items-center justify-center rounded-full bg-white overflow-hidden shrink-0">
+              <span className="flex w-7 h-7 items-center justify-center rounded-full bg-white dark:bg-zinc-800 overflow-hidden shrink-0">
                 <Image
                   src={s.logoUrl}
                   alt={s.label}
@@ -141,7 +141,7 @@ export function LeagueBrowser({ sections }: Props) {
       </div>
         <button
           onClick={() => scrollLeagues("right")}
-          className="hidden md:flex shrink-0 items-center justify-center w-7 h-8 rounded text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
+          className="hidden md:flex shrink-0 items-center justify-center w-7 h-8 rounded text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
           aria-label="Scroll right"
         >
           ›
@@ -154,7 +154,7 @@ export function LeagueBrowser({ sections }: Props) {
           if (s.type === "tournament") {
             return (
               <section key={s.id}>
-                <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-400 mb-4">
+                <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 mb-4">
                   Tournaments
                 </h2>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -170,7 +170,7 @@ export function LeagueBrowser({ sections }: Props) {
                     />
                     <Link
                       href={`/tournament/${s.slug}`}
-                      className="block text-center text-sm text-zinc-500 hover:text-zinc-700 transition-colors py-1"
+                      className="block text-center text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors py-1"
                     >
                       View full schedule →
                     </Link>
@@ -183,12 +183,12 @@ export function LeagueBrowser({ sections }: Props) {
           return (
             <section key={s.id}>
               <div className="flex items-baseline gap-3 mb-4">
-                <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-400">
+                <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
                   {s.label}
                 </h2>
-                <span className="text-xs text-zinc-300">{s.teams.length} teams</span>
+                <span className="text-xs text-zinc-300 dark:text-zinc-600">{s.teams.length} teams</span>
               </div>
-              <div className="rounded-2xl border border-zinc-200 bg-white overflow-hidden shadow-sm">
+              <div className="rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 overflow-hidden shadow-sm">
                 <TeamList prefix={s.prefix} teams={s.teams} />
               </div>
             </section>

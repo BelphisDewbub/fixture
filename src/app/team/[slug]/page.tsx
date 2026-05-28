@@ -7,6 +7,7 @@ import { fetchLiveForTeam } from "@/lib/sports/espn/client";
 import { LiveGameBanner } from "@/components/LiveGameBanner";
 import { ScheduleTable, type SerializedGame } from "@/components/ScheduleTable";
 import { SubscribeStrip } from "@/components/SubscribeStrip";
+import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { Footer } from "@/components/Footer";
 import type { Game } from "@/types";
 
@@ -52,19 +53,22 @@ export default async function TeamPage({ params }: Props) {
   }));
 
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans">
-      <header className="border-b border-zinc-200 bg-white">
-        <div className="mx-auto max-w-4xl px-6 py-4 flex items-center gap-3">
-          <Link
-            href="/"
-            className="text-sm text-zinc-400 hover:text-zinc-600 transition-colors"
-          >
-            ← Back
-          </Link>
-          <span className="text-zinc-200">|</span>
-          <span className="text-sm font-medium text-zinc-500">
-            {team.prefix.toUpperCase()}
-          </span>
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 font-sans">
+      <header className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800">
+        <div className="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="text-sm text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+            >
+              ← Back
+            </Link>
+            <span className="text-zinc-200 dark:text-zinc-700">|</span>
+            <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+              {team.prefix.toUpperCase()}
+            </span>
+          </div>
+          <DarkModeToggle />
         </div>
       </header>
 
@@ -80,10 +84,10 @@ export default async function TeamPage({ params }: Props) {
             />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-widest text-green-600 mb-1">
+            <p className="text-xs font-semibold uppercase tracking-widest text-green-600 dark:text-green-400 mb-1">
               {team.prefix.toUpperCase()}
             </p>
-            <h1 className="text-2xl font-bold text-zinc-900 leading-tight">
+            <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 leading-tight">
               {team.name}
             </h1>
           </div>

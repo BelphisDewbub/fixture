@@ -33,7 +33,7 @@ export function TournamentTabs({ games, tournamentSlug, teams, groups, bracketRo
 
   return (
     <div>
-      <div className="flex gap-1 mb-6 border-b border-zinc-200 overflow-x-auto">
+      <div className="flex gap-1 mb-6 border-b border-zinc-200 dark:border-zinc-700 overflow-x-auto">
         {tabs
           .filter((t) => t.visible)
           .map((t) => (
@@ -42,8 +42,8 @@ export function TournamentTabs({ games, tournamentSlug, teams, groups, bracketRo
               onClick={() => setTab(t.id)}
               className={`px-4 py-2 text-sm font-semibold transition-colors border-b-2 -mb-px whitespace-nowrap ${
                 tab === t.id
-                  ? "border-zinc-900 text-zinc-900"
-                  : "border-transparent text-zinc-400 hover:text-zinc-600"
+                  ? "border-zinc-900 dark:border-zinc-100 text-zinc-900 dark:text-zinc-100"
+                  : "border-transparent text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
               }`}
             >
               {t.label}
