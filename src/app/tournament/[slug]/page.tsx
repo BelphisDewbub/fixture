@@ -4,9 +4,10 @@ import Link from "next/link";
 import { getWorldCupGames } from "@/lib/sports/espn/world-cup";
 import { ACTIVE_STATUSES } from "@/lib/sports/resolve";
 import { LiveGameBanner } from "@/components/LiveGameBanner";
-import { ScheduleTable, type SerializedGame } from "@/components/ScheduleTable";
 import { SubscribeStrip } from "@/components/SubscribeStrip";
+import { TournamentTabs } from "@/components/TournamentTabs";
 import { Footer } from "@/components/Footer";
+import type { SerializedGame } from "@/components/ScheduleTable";
 import type { Game } from "@/types";
 
 const ESPN_BASE = "https://site.api.espn.com/apis/site/v2/sports";
@@ -72,6 +73,10 @@ export default async function TournamentPage({ params }: Props) {
       }
     : undefined;
 
+  const teamNames = Array.from(
+    new Set((games as Game[]).flatMap((g) => [g.homeTeam, g.awayTeam]))
+  ).filter((name) => name !== "TBD").sort((a, b) => a.localeCompare(b));
+
   const serialized: SerializedGame[] = (games as Game[]).map((g) => ({
     id: g.id,
     homeTeam: g.homeTeam,
@@ -122,7 +127,7 @@ export default async function TournamentPage({ params }: Props) {
           initial={{ hasLive: isLive, game: liveGame }}
         />
 
-        <ScheduleTable games={serialized} />
+        <TournamentTabs games={serialized} tournamentSlug={slug} teams={teamNames} />
       </main>
       <Footer />
     </div>
