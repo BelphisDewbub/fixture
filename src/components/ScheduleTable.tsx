@@ -42,6 +42,12 @@ function GameRow({ game, muted }: { game: SerializedGame; muted?: boolean }) {
     ...(game.broadcastInfo?.streamingServices ?? []),
   ].join(", ");
 
+  const hasScore = game.completed && game.homeScore != null && game.awayScore != null;
+  const hg = hasScore ? parseInt(game.homeScore!, 10) : null;
+  const ag = hasScore ? parseInt(game.awayScore!, 10) : null;
+  const homeWon = hg != null && ag != null && hg > ag;
+  const awayWon = hg != null && ag != null && ag > hg;
+
   return (
     <tr
       className={`border-b border-zinc-100 dark:border-zinc-800 last:border-0 transition-opacity ${
@@ -54,6 +60,16 @@ function GameRow({ game, muted }: { game: SerializedGame; muted?: boolean }) {
           <span className="text-zinc-400 dark:text-zinc-500 font-normal text-xs">at</span>{" "}
           {game.homeTeam}
         </p>
+        {hasScore && (
+          <div className="flex justify-between mt-1">
+            <span className={`font-mono text-xs font-semibold ${awayWon ? "text-zinc-800 dark:text-zinc-200" : homeWon ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-500 dark:text-zinc-400"}`}>
+              {game.awayScore}
+            </span>
+            <span className={`font-mono text-xs font-semibold ${homeWon ? "text-zinc-800 dark:text-zinc-200" : awayWon ? "text-zinc-300 dark:text-zinc-600" : "text-zinc-500 dark:text-zinc-400"}`}>
+              {game.homeScore}
+            </span>
+          </div>
+        )}
         {game.venue && (
           <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">{game.venue}</p>
         )}

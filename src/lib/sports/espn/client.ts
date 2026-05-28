@@ -5,7 +5,7 @@ const BASE = "https://site.api.espn.com/apis/site/v2/sports";
 export interface ESPNCompetitor {
   homeAway: "home" | "away";
   team: { id: string; displayName: string };
-  score?: string;
+  score?: string | { value: number; displayValue: string };
 }
 
 export interface ESPNEvent {
@@ -135,10 +135,19 @@ export function espnToGame(event: ESPNEvent, competitionLabel: string, leagueUrl
 
   if (leagueUrl) broadcastInfo.leagueUrl = leagueUrl;
 
+  const completed = comp.status.type.completed;
+  const scoreStr = (s: ESPNCompetitor["score"]) =>
+    typeof s === "object" && s !== null ? s.displayValue : s;
+
   return {
     id: event.id,
     homeTeam: home?.team.displayName ?? "TBD",
     awayTeam: away?.team.displayName ?? "TBD",
+    ...(completed && {
+      completed: true,
+      homeScore: scoreStr(home?.score),
+      awayScore: scoreStr(away?.score),
+    }),
     kickoff: new Date(event.date),
     venue: comp.venue?.fullName,
     competition: competitionLabel,
