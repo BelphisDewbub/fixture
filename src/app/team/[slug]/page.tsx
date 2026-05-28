@@ -7,6 +7,7 @@ import { fetchLiveForTeam } from "@/lib/sports/espn/client";
 import { LiveGameBanner } from "@/components/LiveGameBanner";
 import { ScheduleTable, type SerializedGame } from "@/components/ScheduleTable";
 import { SubscribeStrip } from "@/components/SubscribeStrip";
+import { Footer } from "@/components/Footer";
 import type { Game } from "@/types";
 
 interface Props {
@@ -94,6 +95,7 @@ export default async function TeamPage({ params }: Props) {
 
         <ScheduleTable games={serialized} />
       </main>
+      <Footer />
     </div>
   );
 }

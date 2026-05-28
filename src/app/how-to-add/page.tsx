@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Footer } from "@/components/Footer";
 import { CalendarGuide } from "./CalendarGuide";
 
 export const metadata = {
@@ -37,6 +38,7 @@ export default function HowToAddPage() {
 
         <CalendarGuide />
       </main>
+      <Footer />
     </div>
   );
 }

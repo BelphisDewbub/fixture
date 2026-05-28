@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Footer } from "@/components/Footer";
 import { LeagueBrowser } from "@/components/LeagueBrowser";
 import { MLB_TEAMS } from "@/lib/sports/espn/mlb";
 import { NFL_TEAMS } from "@/lib/sports/espn/nfl";
@@ -114,13 +115,7 @@ export default function Home() {
         <LeagueBrowser sections={SECTIONS} />
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-zinc-200 py-8 text-center text-xs text-zinc-400">
-        Fixture · Game data via{" "}
-        <a href="https://www.espn.com" className="underline hover:text-zinc-600">
-          ESPN
-        </a>
-      </footer>
+      <Footer />
     </div>
   );
 }

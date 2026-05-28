@@ -6,6 +6,7 @@ import { ACTIVE_STATUSES } from "@/lib/sports/resolve";
 import { LiveGameBanner } from "@/components/LiveGameBanner";
 import { ScheduleTable, type SerializedGame } from "@/components/ScheduleTable";
 import { SubscribeStrip } from "@/components/SubscribeStrip";
+import { Footer } from "@/components/Footer";
 import type { Game } from "@/types";
 
 const ESPN_BASE = "https://site.api.espn.com/apis/site/v2/sports";
@@ -123,6 +124,7 @@ export default async function TournamentPage({ params }: Props) {
 
         <ScheduleTable games={serialized} />
       </main>
+      <Footer />
     </div>
   );
 }
