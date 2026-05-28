@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { SubscribeCard } from "./SubscribeCard";
@@ -44,6 +44,11 @@ interface Props {
 export function LeagueBrowser({ sections }: Props) {
   const [activeSport, setActiveSport] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  function scrollLeagues(dir: "left" | "right") {
+    scrollRef.current?.scrollBy({ left: dir === "right" ? 240 : -240, behavior: "smooth" });
+  }
 
   const sports = Array.from(new Set(sections.map((s) => s.sport))).sort();
   const sportFiltered = activeSport ? sections.filter((s) => s.sport === activeSport) : sections;
@@ -88,7 +93,15 @@ export function LeagueBrowser({ sections }: Props) {
       </div>
 
       {/* Horizontal league picker */}
-      <div className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() => scrollLeagues("left")}
+          className="hidden md:flex shrink-0 items-center justify-center w-7 h-8 rounded text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
+          aria-label="Scroll left"
+        >
+          ‹
+        </button>
+      <div ref={scrollRef} className="flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <div className="flex gap-3 pb-1 min-w-max">
           <button
             onClick={() => setActiveId(null)}
@@ -125,6 +138,14 @@ export function LeagueBrowser({ sections }: Props) {
             </button>
           ))}
         </div>
+      </div>
+        <button
+          onClick={() => scrollLeagues("right")}
+          className="hidden md:flex shrink-0 items-center justify-center w-7 h-8 rounded text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
+          aria-label="Scroll right"
+        >
+          ›
+        </button>
       </div>
 
       {/* Content sections */}
