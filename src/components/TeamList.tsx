@@ -41,6 +41,10 @@ export function TeamList({ prefix, teams }: Props) {
     return `https://www.google.com/calendar/render?cid=${encodeURIComponent(webcalUrl(slug))}`;
   }
 
+  function outlookCalUrl(slug: string) {
+    return `https://outlook.live.com/calendar/0/addfromweb?url=${encodeURIComponent(feedUrl(slug))}`;
+  }
+
   async function copy(slug: string) {
     await navigator.clipboard.writeText(webcalUrl(slug));
     setCopied(true);
@@ -104,7 +108,9 @@ export function TeamList({ prefix, teams }: Props) {
                   Apple Calendar
                 </a>
                 <a
-                  href={webcalUrl(slug)}
+                  href={outlookCalUrl(slug)}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100 transition-colors"
                 >
                   Outlook

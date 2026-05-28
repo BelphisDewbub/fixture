@@ -20,6 +20,9 @@ export function SubscribeStrip({ slug }: Props) {
   const googleCalUrl = feedUrl
     ? `https://www.google.com/calendar/render?cid=${encodeURIComponent(webcalUrl)}`
     : "";
+  const outlookCalUrl = feedUrl
+    ? `https://outlook.live.com/calendar/0/addfromweb?url=${encodeURIComponent(feedUrl)}`
+    : "";
 
   async function copy() {
     await navigator.clipboard.writeText(webcalUrl);
@@ -88,7 +91,9 @@ export function SubscribeStrip({ slug }: Props) {
                 Apple Calendar
               </a>
               <a
-                href={webcalUrl}
+                href={outlookCalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100 transition-colors"
               >
                 Outlook

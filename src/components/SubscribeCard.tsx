@@ -26,6 +26,9 @@ export function SubscribeCard({ slug, name, sport, dates, description, matchCoun
   const googleCalUrl = feedUrl
     ? `https://www.google.com/calendar/render?cid=${encodeURIComponent(webcalUrl)}`
     : "";
+  const outlookCalUrl = feedUrl
+    ? `https://outlook.live.com/calendar/0/addfromweb?url=${encodeURIComponent(feedUrl)}`
+    : "";
 
   async function copy() {
     await navigator.clipboard.writeText(webcalUrl);
@@ -113,7 +116,9 @@ export function SubscribeCard({ slug, name, sport, dates, description, matchCoun
                   Apple Calendar
                 </a>
                 <a
-                  href={webcalUrl}
+                  href={outlookCalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100 transition-colors"
                 >
                   Outlook

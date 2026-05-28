@@ -29,6 +29,11 @@ export function TournamentTeamList({ tournamentSlug, teams }: Props) {
     return `https://www.google.com/calendar/render?cid=${encodeURIComponent(webcalUrl(team))}`;
   }
 
+  function outlookCalUrl(team: string) {
+    const url = `${origin}/api/cal/${feedSlug(team)}`;
+    return `https://outlook.live.com/calendar/0/addfromweb?url=${encodeURIComponent(url)}`;
+  }
+
   async function copy(team: string) {
     await navigator.clipboard.writeText(webcalUrl(team));
     setCopied(true);
@@ -90,7 +95,9 @@ export function TournamentTeamList({ tournamentSlug, teams }: Props) {
                     Apple Calendar
                   </a>
                   <a
-                    href={webcalUrl(team)}
+                    href={outlookCalUrl(team)}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100 transition-colors"
                   >
                     Outlook
