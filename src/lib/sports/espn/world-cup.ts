@@ -1,5 +1,8 @@
-import { fetchCompetitionScoreboard } from "./client";
+import { fetchCompetitionScoreboard, type ESPNCompetitor } from "./client";
 import type { Game, BroadcastInfo } from "@/types";
+
+const scoreStr = (s: ESPNCompetitor["score"]) =>
+  typeof s === "object" && s !== null ? s.displayValue : s;
 
 const STAGE_LABELS: Record<string, string> = {
   "group-stage":      "Group Stage",
@@ -68,8 +71,8 @@ export async function getWorldCupGames(): Promise<Game[]> {
       id: e.id,
       homeTeam: home?.team.displayName ?? "TBD",
       awayTeam: away?.team.displayName ?? "TBD",
-      homeScore: isCompleted ? (home?.score ?? undefined) : undefined,
-      awayScore: isCompleted ? (away?.score ?? undefined) : undefined,
+      homeScore: isCompleted ? scoreStr(home?.score) : undefined,
+      awayScore: isCompleted ? scoreStr(away?.score) : undefined,
       completed: isCompleted || undefined,
       kickoff: new Date(e.date),
       venue: comp.venue?.fullName,
