@@ -10,16 +10,13 @@ import { EPL_TEAMS } from "@/lib/sports/espn/premier-league";
 import { WNBA_TEAMS } from "@/lib/sports/espn/wnba";
 import { NCAAF_TEAMS } from "@/lib/sports/espn/ncaa-football";
 import { NCAAB_TEAMS } from "@/lib/sports/espn/ncaa-basketball";
+import { INTL_SOCCER_TEAMS } from "@/lib/sports/espn/intl-soccer";
 
 function sortedTeams(teams: Record<string, { id: number; name: string; logoUrl: string }>) {
   return Object.entries(teams)
     .map(([slug, t]) => ({ slug, name: t.name, logoUrl: t.logoUrl }))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
-
-const INTL_SOCCER_TEAMS = [
-  { slug: "usmnt", name: "USMNT", logoUrl: "https://a.espncdn.com/i/teamlogos/soccer/500/660.png" },
-];
 
 const SECTIONS = [
   {
@@ -29,7 +26,9 @@ const SECTIONS = [
     sport: "Soccer",
     logoUrl: "https://a.espncdn.com/i/leaguelogos/soccer/500/4.png",
     prefix: "intl-soccer",
-    teams: INTL_SOCCER_TEAMS,
+    teams: Object.entries(INTL_SOCCER_TEAMS)
+      .map(([slug, t]) => ({ slug, name: t.name, logoUrl: t.logoUrl }))
+      .sort((a, b) => a.name.localeCompare(b.name)),
   },
   {
     type: "tournament" as const,

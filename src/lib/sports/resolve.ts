@@ -1,3 +1,4 @@
+import { INTL_SOCCER_TEAMS } from "./espn/intl-soccer";
 import { MLB_TEAMS } from "./espn/mlb";
 import { NFL_TEAMS } from "./espn/nfl";
 import { NBA_TEAMS } from "./espn/nba";
@@ -22,8 +23,24 @@ export interface ResolvedTeam {
   prefix: string;
   teamSlug: string;
   espnSport: string;
+  /** Empty string signals a multi-competition team — skip single-league live detection */
   espnLeague: string;
 }
+
+const STATIC_TEAM_MAP: Record<string, ResolvedTeam> = Object.fromEntries(
+  Object.entries(INTL_SOCCER_TEAMS).map(([slug, t]) => [
+    `intl-soccer-${slug}`,
+    {
+      id: t.id,
+      name: t.name,
+      logoUrl: t.logoUrl,
+      prefix: "intl-soccer",
+      teamSlug: slug,
+      espnSport: "soccer",
+      espnLeague: "",
+    },
+  ])
+);
 
 const PREFIX_MAP: Record<
   string,
@@ -45,6 +62,8 @@ const PREFIX_MAP: Record<
 };
 
 export function resolveTeamSlug(fullSlug: string): ResolvedTeam | null {
+  if (STATIC_TEAM_MAP[fullSlug]) return STATIC_TEAM_MAP[fullSlug];
+
   const dashIdx = fullSlug.indexOf("-");
   if (dashIdx === -1) return null;
 

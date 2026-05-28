@@ -1,6 +1,6 @@
 import type { Game } from "@/types";
 import { getWorldCupGames } from "./espn/world-cup";
-import { getUsmntGames } from "./espn/usmnt";
+import { INTL_SOCCER_TEAMS, getIntlSoccerGames } from "./espn/intl-soccer";
 import { getMlbTeamGames, MLB_TEAMS } from "./espn/mlb";
 import { getNflTeamGames, NFL_TEAMS } from "./espn/nfl";
 import { getNbaTeamGames, NBA_TEAMS } from "./espn/nba";
@@ -11,9 +11,16 @@ import { getWnbaTeamGames, WNBA_TEAMS } from "./espn/wnba";
 import { getNcaafTeamGames, NCAAF_TEAMS } from "./espn/ncaa-football";
 import { getNcaabTeamGames, NCAAB_TEAMS } from "./espn/ncaa-basketball";
 
+const INTL_SOCCER_SLUGS = Object.fromEntries(
+  Object.keys(INTL_SOCCER_TEAMS).map((slug) => [
+    `intl-soccer-${slug}`,
+    () => getIntlSoccerGames(slug),
+  ])
+);
+
 const STATIC_SLUGS: Record<string, () => Promise<Game[]>> = {
-  "world-cup-2026":       getWorldCupGames,
-  "intl-soccer-usmnt":   getUsmntGames,
+  "world-cup-2026": getWorldCupGames,
+  ...INTL_SOCCER_SLUGS,
 };
 
 function makeTeamSlugs<T extends { id: number; name: string; logoUrl: string }>(

@@ -21,7 +21,9 @@ export default async function TeamPage({ params }: Props) {
 
   const [games, liveEvent] = await Promise.all([
     getGamesBySlug(slug).catch(() => [] as Game[]),
-    fetchLiveForTeam(team.espnSport, team.espnLeague, team.id).catch(() => null),
+    team.espnLeague
+      ? fetchLiveForTeam(team.espnSport, team.espnLeague, team.id).catch(() => null)
+      : Promise.resolve(null),
   ]);
 
   const comp = liveEvent?.competitions[0];

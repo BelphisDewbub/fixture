@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { resolveTeamSlug, ACTIVE_STATUSES } from "@/lib/sports/resolve";
 import { fetchLiveForTeam, type ESPNEvent } from "@/lib/sports/espn/client";
-import { getLiveUsmntGame } from "@/lib/sports/espn/usmnt";
+import { getLiveIntlSoccerGame } from "@/lib/sports/espn/intl-soccer";
 
 export const dynamic = "force-dynamic";
 
@@ -13,9 +13,10 @@ export async function GET(
 ) {
   const { slug } = await params;
 
-  if (slug === "intl-soccer-usmnt") {
+  if (slug.startsWith("intl-soccer-")) {
+    const teamSlug = slug.slice("intl-soccer-".length);
     try {
-      const event = await getLiveUsmntGame();
+      const event = await getLiveIntlSoccerGame(teamSlug);
       if (!event) return NextResponse.json({ hasLive: false });
       if (!ACTIVE_STATUSES.has(event.competitions[0]?.status?.type?.name ?? "")) {
         return NextResponse.json({ hasLive: false });
