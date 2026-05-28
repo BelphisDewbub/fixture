@@ -75,7 +75,7 @@ export default async function TournamentPage({ params }: Props) {
 
   const teamNames = Array.from(
     new Set((games as Game[]).flatMap((g) => [g.homeTeam, g.awayTeam]))
-  ).filter((name) => name !== "TBD").sort((a, b) => a.localeCompare(b));
+  ).filter((name) => !/Winner|Loser|Place|^TBD$/i.test(name)).sort((a, b) => a.localeCompare(b));
 
   const serialized: SerializedGame[] = (games as Game[]).map((g) => ({
     id: g.id,
