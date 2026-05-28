@@ -72,7 +72,7 @@ function GoogleTab() {
           </Step>
         </div>
         <Tip>
-          Your feed URL starts with <code className="font-mono bg-zinc-100 dark:bg-zinc-800 px-1 rounded text-xs">webcal://</code> — paste it exactly as copied from Fixture.
+          Your feed URL starts with <code className="font-mono bg-zinc-100 dark:bg-zinc-800 px-1 rounded text-xs">https://</code> — paste it exactly as copied from Fixture.
         </Tip>
       </div>
 
@@ -249,10 +249,9 @@ function OtherTab() {
       </ul>
       <Tip>
         When asked for a URL, paste your Fixture feed URL exactly as shown — it starts
+        with <code className="font-mono bg-zinc-100 dark:bg-zinc-800 px-1 rounded text-xs">https://</code>.
+        If your app specifically requires a webcal link, some apps also accept it starting
         with <code className="font-mono bg-zinc-100 dark:bg-zinc-800 px-1 rounded text-xs">webcal://</code>.
-        Some apps may also accept it starting with{" "}
-        <code className="font-mono bg-zinc-100 dark:bg-zinc-800 px-1 rounded text-xs">https://</code> if webcal
-        doesn&apos;t work.
       </Tip>
       <div className="rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5 space-y-2">
         <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Popular apps that work</p>
