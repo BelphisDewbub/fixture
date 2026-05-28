@@ -17,7 +17,20 @@ function sortedTeams(teams: Record<string, { id: number; name: string; logoUrl: 
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
+const INTL_SOCCER_TEAMS = [
+  { slug: "usmnt", name: "USMNT", logoUrl: "https://a.espncdn.com/i/teamlogos/soccer/500/660.png" },
+];
+
 const SECTIONS = [
+  {
+    type: "teams" as const,
+    id: "intl-soccer",
+    label: "International Soccer",
+    sport: "Soccer",
+    logoUrl: "https://a.espncdn.com/i/leaguelogos/soccer/500/4.png",
+    prefix: "intl-soccer",
+    teams: INTL_SOCCER_TEAMS,
+  },
   {
     type: "tournament" as const,
     id: "world-cup-2026",

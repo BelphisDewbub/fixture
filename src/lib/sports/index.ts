@@ -1,5 +1,6 @@
 import type { Game } from "@/types";
 import { getWorldCupGames } from "./espn/world-cup";
+import { getUsmntGames } from "./espn/usmnt";
 import { getMlbTeamGames, MLB_TEAMS } from "./espn/mlb";
 import { getNflTeamGames, NFL_TEAMS } from "./espn/nfl";
 import { getNbaTeamGames, NBA_TEAMS } from "./espn/nba";
@@ -11,7 +12,8 @@ import { getNcaafTeamGames, NCAAF_TEAMS } from "./espn/ncaa-football";
 import { getNcaabTeamGames, NCAAB_TEAMS } from "./espn/ncaa-basketball";
 
 const STATIC_SLUGS: Record<string, () => Promise<Game[]>> = {
-  "world-cup-2026": getWorldCupGames,
+  "world-cup-2026":       getWorldCupGames,
+  "intl-soccer-usmnt":   getUsmntGames,
 };
 
 function makeTeamSlugs<T extends { id: number; name: string; logoUrl: string }>(
