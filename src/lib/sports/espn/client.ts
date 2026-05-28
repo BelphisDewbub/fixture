@@ -86,6 +86,7 @@ export function espnToGame(event: ESPNEvent, competitionLabel: string, leagueUrl
   const networks: string[] = [];
   const streaming: string[] = [];
   for (const b of comp.broadcasts ?? []) {
+    if (!b.type || !b.media) continue;
     if (b.type.shortName === "TV") networks.push(b.media.shortName);
     else streaming.push(b.media.shortName);
   }
