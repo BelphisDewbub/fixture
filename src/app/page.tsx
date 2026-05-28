@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { LeagueBrowser } from "@/components/LeagueBrowser";
 import { MLB_TEAMS } from "@/lib/sports/espn/mlb";
 import { NFL_TEAMS } from "@/lib/sports/espn/nfl";
@@ -96,6 +97,16 @@ export default function Home() {
               <span className="text-sm text-zinc-700">{label}</span>
             </div>
           ))}
+          <Link
+            href="/how-to-add"
+            className="flex items-center gap-3 rounded-xl bg-white border border-zinc-200 px-5 py-4 hover:border-zinc-300 hover:bg-zinc-50 transition-colors group"
+          >
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-sm font-bold text-zinc-500">
+              ?
+            </span>
+            <span className="text-sm text-zinc-700 flex-1">Not sure how to add it? Step-by-step guides</span>
+            <span className="text-zinc-300 group-hover:text-zinc-500 transition-colors text-sm">→</span>
+          </Link>
         </div>
       </section>
 
