@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface TeamEntry {
   slug: string;
@@ -54,7 +55,12 @@ export function TeamList({ prefix, teams }: Props) {
             <div className="shrink-0 w-8 h-8 relative">
               <Image src={logoUrl} alt={name} fill className="object-contain" unoptimized />
             </div>
-            <span className="flex-1 text-sm font-medium text-zinc-800">{name}</span>
+            <Link
+              href={`/team/${prefix}-${slug}`}
+              className="flex-1 text-sm font-medium text-zinc-800 hover:text-green-700 transition-colors"
+            >
+              {name}
+            </Link>
             <button
               onClick={() => toggle(slug)}
               className="shrink-0 rounded-lg bg-green-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-700 transition-colors"

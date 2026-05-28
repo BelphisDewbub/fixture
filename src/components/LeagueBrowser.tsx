@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { SubscribeCard } from "./SubscribeCard";
 import { TeamList } from "./TeamList";
 
@@ -100,15 +101,23 @@ export function LeagueBrowser({ sections }: Props) {
                   Tournaments
                 </h2>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <SubscribeCard
-                    slug={s.slug}
-                    name={s.name}
-                    sport={s.sport}
-                    dates={s.dates}
-                    description={s.description}
-                    matchCount={s.matchCount}
-                    logoUrl={s.logoUrl}
-                  />
+                  <div className="space-y-2">
+                    <SubscribeCard
+                      slug={s.slug}
+                      name={s.name}
+                      sport={s.sport}
+                      dates={s.dates}
+                      description={s.description}
+                      matchCount={s.matchCount}
+                      logoUrl={s.logoUrl}
+                    />
+                    <Link
+                      href={`/tournament/${s.slug}`}
+                      className="block text-center text-sm text-zinc-500 hover:text-zinc-700 transition-colors py-1"
+                    >
+                      View full schedule →
+                    </Link>
+                  </div>
                 </div>
               </section>
             );

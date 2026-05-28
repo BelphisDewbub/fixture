@@ -5,6 +5,7 @@ const BASE = "https://site.api.espn.com/apis/site/v2/sports";
 export interface ESPNCompetitor {
   homeAway: "home" | "away";
   team: { id: string; displayName: string };
+  score?: string;
 }
 
 export interface ESPNEvent {
@@ -23,7 +24,11 @@ export interface ESPNEvent {
       market?: string;
       names?: string[];
     }>;
-    status: { type: { name: string; completed: boolean } };
+    status: {
+      displayClock?: string;
+      period?: number;
+      type: { name: string; completed: boolean; description?: string; shortDetail?: string };
+    };
     links?: Array<{ rel: string[]; href: string }>;
   }>;
 }
@@ -75,6 +80,22 @@ export async function fetchCompetitionScoreboard(
   const data: ESPNScoreboardResponse = await res.json();
   return (data.events ?? []).filter(
     (e) => !SKIP_STATUSES.has(e.competitions[0]?.status.type.name)
+  );
+}
+
+export async function fetchLiveForTeam(
+  sport: string,
+  league: string,
+  teamId: string | number
+): Promise<ESPNEvent | null> {
+  const res = await fetch(`${BASE}/${sport}/${league}/scoreboard`, { cache: "no-store" });
+  if (!res.ok) return null;
+  const data: ESPNScoreboardResponse = await res.json();
+  const id = String(teamId);
+  return (
+    data.events?.find((e) =>
+      e.competitions[0]?.competitors.some((c) => c.team.id === id)
+    ) ?? null
   );
 }
 
