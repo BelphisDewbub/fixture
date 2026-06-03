@@ -3,25 +3,30 @@
 import { useState } from "react";
 import Image from "next/image";
 import { InviteLinkCopy } from "@/components/InviteLinkCopy";
+import { DeleteChallengeButton } from "@/components/challenges/DeleteChallengeButton";
+import { WeightsForm } from "@/components/challenges/WeightsForm";
+import { MembersManager } from "@/components/challenges/MembersManager";
 import { GroupPicksForm } from "@/components/challenges/GroupPicksForm";
 import { BracketPicksForm } from "@/components/challenges/BracketPicksForm";
 import { Leaderboard } from "@/components/challenges/Leaderboard";
 import type { GroupData, BracketRound } from "@/lib/tournament/structure";
 import type { GroupPicksData, BracketPicksData } from "@/lib/actions/picks";
 import type { LeaderboardRow } from "@/components/challenges/Leaderboard";
+import { type ChallengeWeights, WEIGHT_LABELS } from "@/lib/weights";
 
 interface Member {
-  id: string;
   name: string | null;
   image: string | null;
 }
 
 interface Entry {
   userId: string;
+  isAdmin: boolean;
   user: Member;
 }
 
 interface ChallengeInfo {
+  id: string;
   createdById: string;
   entries: Entry[];
 }
@@ -38,6 +43,7 @@ interface Props {
   challenge: ChallengeInfo;
   myUserId: string;
   myEntryId: string;
+  myIsAdmin: boolean;
   inviteUrl: string;
   groups: GroupData[];
   bracketRounds: BracketRound[];
@@ -48,14 +54,32 @@ interface Props {
   bracketPicksLocked: boolean;
   leaderboard: LeaderboardRow[];
   allPicksData: PlayerPicksRow[];
+  weights: ChallengeWeights;
 }
 
-type Tab = "leaderboard" | "picks" | "overview";
+type Tab = "leaderboard" | "picks" | "overview" | "settings";
+
+const TAB_LABELS: Record<Tab, string> = {
+  leaderboard: "Leaderboard",
+  picks: "My Picks",
+  overview: "Overview",
+  settings: "Settings",
+};
+
+const BRACKET_SLUGS = [
+  "round-of-32",
+  "round-of-16",
+  "quarterfinals",
+  "semifinals",
+  "3rd-place-match",
+  "final",
+] as const;
 
 export function ChallengeTabs({
   challenge,
   myUserId,
   myEntryId,
+  myIsAdmin,
   inviteUrl,
   groups,
   bracketRounds,
@@ -66,15 +90,15 @@ export function ChallengeTabs({
   bracketPicksLocked,
   leaderboard,
   allPicksData,
+  weights,
 }: Props) {
-  const [tab, setTab] = useState<Tab>("leaderboard");
+  const [tab, setTab] = useState<Tab>("overview");
   const [viewingUserId, setViewingUserId] = useState(myUserId);
 
-  const TAB_LABELS: Record<Tab, string> = {
-    leaderboard: "Leaderboard",
-    picks: "My Picks",
-    overview: "Overview",
-  };
+  const isOwner = myUserId === challenge.createdById;
+  const isOwnerOrAdmin = isOwner || myIsAdmin;
+
+  const visibleTabs: Tab[] = ["overview", "leaderboard", "picks", ...(isOwnerOrAdmin ? (["settings"] as Tab[]) : [])];
 
   const anyLocked = groupPicksLocked || bracketPicksLocked;
   const isViewingOwn = viewingUserId === myUserId;
@@ -86,7 +110,7 @@ export function ChallengeTabs({
   return (
     <div>
       <div className="flex gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg mb-6 w-fit">
-        {(["leaderboard", "picks", "overview"] as Tab[]).map((t) => (
+        {visibleTabs.map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -140,12 +164,47 @@ export function ChallengeTabs({
               ))}
             </ul>
           </div>
+
+          <div className="rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-5 space-y-4">
+            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+              How points are calculated
+            </h2>
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                Group Stage
+              </p>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                  {weights.groupStage} pt
+                </span>
+                {" "}per team in the correct standings position
+              </p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-xs font-medium uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                Knockout Rounds
+              </p>
+              {BRACKET_SLUGS.map((slug) => (
+                <div key={slug} className="flex items-center justify-between text-sm">
+                  <span className="text-zinc-600 dark:text-zinc-400">{WEIGHT_LABELS[slug]}</span>
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                    {weights[slug]} {weights[slug] === 1 ? "pt" : "pts"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {isOwner && (
+            <div className="flex justify-end">
+              <DeleteChallengeButton challengeId={challenge.id} />
+            </div>
+          )}
         </div>
       )}
 
       {tab === "picks" && (
         <div className="space-y-10">
-          {/* Player selector — visible once any section is locked */}
           {anyLocked && (
             <div className="flex flex-wrap gap-2">
               {allPicksData.map((player) => {
@@ -178,7 +237,6 @@ export function ChallengeTabs({
             </div>
           )}
 
-          {/* Group stage — always visible for own picks; visible for others only when locked */}
           {(isViewingOwn || groupPicksLocked) && (
             <div>
               <div className="flex items-center gap-3 mb-4">
@@ -201,7 +259,6 @@ export function ChallengeTabs({
             </div>
           )}
 
-          {/* Bracket — always visible for own picks; visible for others only when locked */}
           {(isViewingOwn || bracketPicksLocked) && (
             <div>
               <div className="flex items-center gap-3 mb-4">
@@ -227,6 +284,26 @@ export function ChallengeTabs({
               />
             </div>
           )}
+        </div>
+      )}
+
+      {tab === "settings" && isOwnerOrAdmin && (
+        <div className="space-y-5">
+          {isOwner && (
+            <WeightsForm challengeId={challenge.id} initialWeights={weights} />
+          )}
+          <MembersManager
+            challengeId={challenge.id}
+            members={challenge.entries.map((e) => ({
+              userId: e.userId,
+              name: e.user.name,
+              image: e.user.image,
+              isAdmin: e.isAdmin,
+              isOwner: e.userId === challenge.createdById,
+            }))}
+            myUserId={myUserId}
+            viewerIsOwner={isOwner}
+          />
         </div>
       )}
     </div>

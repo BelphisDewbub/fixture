@@ -12,6 +12,7 @@ import type { Game } from "@/types";
 import { scoreGroupPicks, scoreBracketPicks } from "@/lib/scoring";
 import { simulateGroupStage, simulateAllBracketRounds } from "@/lib/simulate";
 import type { GroupPicksData, BracketPicksData } from "@/lib/actions/picks";
+import { resolveWeights } from "@/lib/weights";
 
 const TEST_SIMULATE_RESULTS = false;
 
@@ -47,6 +48,7 @@ export default async function ChallengePage({ params }: Props) {
   if (!isMember) redirect(`/challenges/join/${challenge.inviteCode}`);
 
   const myEntry = challenge.entries.find((e) => e.userId === session.user.id)!;
+  const weights = resolveWeights(challenge.weights);
 
   const fetcher = TOURNAMENT_FETCHERS[challenge.tournamentSlug];
   const [games, allPicks] = await Promise.all([
@@ -121,8 +123,8 @@ export default async function ChallengePage({ params }: Props) {
     const entryPicks = allPicks.filter((p) => p.entryId === entry.id);
     const gPicks = (entryPicks.find((p) => p.phase === "groups")?.data ?? {}) as GroupPicksData;
     const bPicks = (entryPicks.find((p) => p.phase === "bracket")?.data ?? {}) as BracketPicksData;
-    const groupScore = scoreGroupPicks(gPicks, groups);
-    const bracketScore = scoreBracketPicks(bPicks, bracketRounds);
+    const groupScore = scoreGroupPicks(gPicks, groups, weights);
+    const bracketScore = scoreBracketPicks(bPicks, bracketRounds, weights);
     return {
       userId: entry.userId,
       name: entry.user.name,
@@ -155,11 +157,14 @@ export default async function ChallengePage({ params }: Props) {
 
         <ChallengeTabs
           challenge={{
+            id: challenge.id,
             createdById: challenge.createdById,
             entries: challenge.entries,
           }}
           myUserId={session.user.id}
           myEntryId={myEntry.id}
+          myIsAdmin={myEntry.isAdmin}
+          weights={weights}
           inviteUrl={inviteUrl}
           groups={groups}
           bracketRounds={bracketRounds}
