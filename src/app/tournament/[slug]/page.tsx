@@ -1,13 +1,11 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import { getWorldCupGames } from "@/lib/sports/espn/world-cup";
 import { ACTIVE_STATUSES } from "@/lib/sports/resolve";
 import { buildTournamentStructure } from "@/lib/tournament/structure";
 import { LiveGameBanner } from "@/components/LiveGameBanner";
 import { SubscribeStrip } from "@/components/SubscribeStrip";
 import { TournamentTabs } from "@/components/TournamentTabs";
-import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { Footer } from "@/components/Footer";
 import type { SerializedGame } from "@/components/ScheduleTable";
 import type { Game } from "@/types";
@@ -98,18 +96,6 @@ export default async function TournamentPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 font-sans">
-      <header className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800">
-        <div className="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between">
-          <Link
-            href="/"
-            className="text-sm text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
-          >
-            ← Back
-          </Link>
-          <DarkModeToggle />
-        </div>
-      </header>
-
       <main className="mx-auto max-w-4xl px-6 py-10">
         <div className="flex items-center gap-5 mb-8">
           <div className="shrink-0 w-16 h-16 relative">

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Footer } from "@/components/Footer";
 import { LeagueBrowser } from "@/components/LeagueBrowser";
-import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { MLB_TEAMS } from "@/lib/sports/espn/mlb";
 import { NFL_TEAMS } from "@/lib/sports/espn/nfl";
 import { NBA_TEAMS } from "@/lib/sports/espn/nba";
@@ -129,19 +128,6 @@ const SECTIONS = [
 export default function Home() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900 font-sans">
-      {/* Header */}
-      <header className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-800">
-        <div className="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between">
-          <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Fixture</span>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-zinc-400 dark:text-zinc-500 hidden sm:block">
-              Sports schedules, straight to your calendar
-            </span>
-            <DarkModeToggle />
-          </div>
-        </div>
-      </header>
-
       {/* Hero */}
       <section className="mx-auto max-w-4xl px-6 py-16 text-center">
         <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
