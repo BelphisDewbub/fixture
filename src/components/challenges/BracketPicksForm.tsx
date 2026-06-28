@@ -20,7 +20,16 @@ const CONNECTOR_W = 20;
 const HEADER_H = 28; // px reserved for round label above each column
 
 function isTbd(team: string) {
-  return /^(TBD|Winner|Loser|Place)/i.test(team);
+  // Catches "TBD", "Place…", and ESPN placeholders like "Round of 32 3 Winner"
+  // or "Semifinal 1 Loser" which contain Winner/Loser anywhere in the string.
+  return !team || /^(TBD|Place)/i.test(team) || /\b(Winner|Loser)\b/i.test(team);
+}
+
+// Extracts the 1-based bracket position from ESPN placeholder names like
+// "Round of 32 3 Winner" → 3, "Quarterfinal 2 Winner" → 2.
+function parseFeederIndex(name: string): number | null {
+  const m = name.match(/\b(\d+)\s+(?:Winner|Loser)\s*$/i);
+  return m ? parseInt(m[1], 10) : null;
 }
 
 export function BracketPicksForm({ bracketRounds, initialPicks, entryId, unlocked, locked }: Props) {
@@ -39,15 +48,21 @@ export function BracketPicksForm({ bracketRounds, initialPicks, entryId, unlocke
   );
 
   // feeders[gameId] = [homeFeederGameId, awayFeederGameId]
-  // For round ri, game gi is fed by rounds[ri-1].games[gi*2] and rounds[ri-1].games[gi*2+1].
+  // For real ESPN data, team names like "Round of 32 3 Winner" encode the
+  // 1-based kickoff-sorted index of the feeder game. For simulation data
+  // (plain "TBD" names) we fall back to the positional gi*2 / gi*2+1 pairing.
   const feeders = useMemo(() => {
     const map = new Map<string, [string, string]>();
     for (let ri = 1; ri < mainRounds.length; ri++) {
+      const prevGames = mainRounds[ri - 1].games;
       for (let gi = 0; gi < mainRounds[ri].games.length; gi++) {
         const game = mainRounds[ri].games[gi];
-        const prev = mainRounds[ri - 1];
-        const hf = prev.games[gi * 2]?.id;
-        const af = prev.games[gi * 2 + 1]?.id;
+        const homeIdx = parseFeederIndex(game.homeTeam);
+        const awayIdx = parseFeederIndex(game.awayTeam);
+        const hf =
+          homeIdx !== null ? prevGames[homeIdx - 1]?.id : prevGames[gi * 2]?.id;
+        const af =
+          awayIdx !== null ? prevGames[awayIdx - 1]?.id : prevGames[gi * 2 + 1]?.id;
         if (hf && af) map.set(game.id, [hf, af]);
       }
     }
