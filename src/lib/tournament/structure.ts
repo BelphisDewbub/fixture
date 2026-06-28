@@ -142,7 +142,14 @@ export function buildTournamentStructure(games: SerializedGame[]): TournamentStr
     .map((slug) => ({
       slug,
       label: KNOCKOUT_ROUND_LABELS[slug],
-      games: (roundMap.get(slug) ?? []).sort((a, b) => a.kickoff.localeCompare(b.kickoff)),
+      games: (roundMap.get(slug) ?? []).sort((a, b) => {
+        // ESPN's "Round of 32 N Winner" labels use ID-ascending order, not kickoff order.
+        // Fall back to kickoff sort for simulation data (non-numeric IDs).
+        const aNum = parseInt(a.id);
+        const bNum = parseInt(b.id);
+        if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
+        return a.kickoff.localeCompare(b.kickoff);
+      }),
     }));
 
   return {

@@ -48,9 +48,10 @@ export function BracketPicksForm({ bracketRounds, initialPicks, entryId, unlocke
   );
 
   // feeders[gameId] = [homeFeederGameId, awayFeederGameId]
-  // For real ESPN data, team names like "Round of 32 3 Winner" encode the
-  // 1-based kickoff-sorted index of the feeder game. For simulation data
-  // (plain "TBD" names) we fall back to the positional gi*2 / gi*2+1 pairing.
+  // ESPN's "Round of 32 N Winner" label uses N = 1-based index in event-ID-
+  // ascending order. buildTournamentStructure now sorts bracket games by ID,
+  // so prevGames[N-1] is correct. Falls back to positional gi*2/gi*2+1 for
+  // simulation data (plain "TBD" names).
   const feeders = useMemo(() => {
     const map = new Map<string, [string, string]>();
     for (let ri = 1; ri < mainRounds.length; ri++) {
@@ -173,14 +174,21 @@ export function BracketPicksForm({ bracketRounds, initialPicks, entryId, unlocke
     // SVG connector to the left of this round (except the first).
     if (ri > 0) {
       const prevSlotSize = SLOT_H * Math.pow(2, ri - 1);
+      const prevGames = mainRounds[ri - 1].games;
       const W = CONNECTOR_W;
       const W2 = W / 2;
 
-      const paths = round.games.map((_, gi) => {
-        const y1 = gi * 2 * prevSlotSize + prevSlotSize / 2;
-        const y2 = (gi * 2 + 1) * prevSlotSize + prevSlotSize / 2;
+      // Use actual feeder positions so connectors draw to the correct games
+      // even when pairs aren't consecutive (2026 WC draw).
+      const paths = round.games.flatMap((game, gi) => {
+        const pair = feeders.get(game.id);
+        const hPos = pair ? prevGames.findIndex((g) => g.id === pair[0]) : gi * 2;
+        const aPos = pair ? prevGames.findIndex((g) => g.id === pair[1]) : gi * 2 + 1;
+        if (hPos < 0 || aPos < 0) return [];
+        const y1 = hPos * prevSlotSize + prevSlotSize / 2;
+        const y2 = aPos * prevSlotSize + prevSlotSize / 2;
         const yMid = gi * slotSize + slotSize / 2;
-        return `M 0 ${y1} H ${W2} V ${y2} H 0 M ${W2} ${yMid} H ${W}`;
+        return [`M 0 ${y1} H ${W2} V ${y2} H 0 M ${W2} ${yMid} H ${W}`];
       });
 
       items.push(
