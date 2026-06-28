@@ -19,6 +19,19 @@ const SLOT_H = 64;
 const CONNECTOR_W = 20;
 const HEADER_H = 28; // px reserved for round label above each column
 
+// FIFA World Cup 2026 — R32 visual bracket slot order (top→bottom) as drawn by FIFA.
+// ESPN's event IDs don't match the draw slot order, so we hardcode it here.
+const FIFA_WC_2026_R32_SLOT_ORDER = [
+  "760489", "760492", // Germany/Paraguay, France/Sweden
+  "760486", "760488", // South Africa/Canada, Netherlands/Morocco
+  "760496", "760497", // Portugal/Croatia, Spain/Austria
+  "760494", "760493", // USA/Bosnia-Herzegovina, Belgium/Senegal
+  "760487", "760490", // Brazil/Japan, Ivory Coast/Norway
+  "760491", "760495", // Mexico/Ecuador, England/Congo DR
+  "760500", "760499", // Argentina/Cape Verde, Australia/Egypt
+  "760498", "760501", // Switzerland/Algeria, Colombia/Ghana
+];
+
 function isTbd(team: string) {
   // Catches "TBD", "Place…", and ESPN placeholders like "Round of 32 3 Winner"
   // or "Semifinal 1 Loser" which contain Winner/Loser anywhere in the string.
@@ -70,12 +83,23 @@ export function BracketPicksForm({ bracketRounds, initialPicks, entryId, unlocke
     return map;
   }, [mainRounds]);
 
-  // Visual sort order for each round: group games by which next-round game they feed
-  // (home feeder first, then away feeder), so feeder pairs are always adjacent.
-  // This matches the actual bracket draw order, which differs from ESPN's event ID order.
+  // Visual display order for each round.
+  // R32: use the FIFA draw slot order (hardcoded — ESPN event IDs don't match draw slots).
+  // Other rounds: group by which next-round game they feed so feeder pairs stay adjacent.
   const sortedGames = useMemo<SerializedGame[][]>(() => {
     return mainRounds.map((round, ri) => {
+      // Hardcoded slot override for this round?
+      if (round.slug === "round-of-32") {
+        const slotted = FIFA_WC_2026_R32_SLOT_ORDER
+          .map((id) => round.games.find((g) => g.id === id))
+          .filter((g): g is SerializedGame => g !== undefined);
+        const seen = new Set(slotted.map((g) => g.id));
+        for (const g of round.games) if (!seen.has(g.id)) slotted.push(g);
+        return slotted;
+      }
+      // Final round has no next round to sort by.
       if (ri >= mainRounds.length - 1) return round.games;
+      // Sort by next-round feeder order: home feeder first, then away feeder.
       const nextRound = mainRounds[ri + 1];
       const ordered: SerializedGame[] = [];
       const seen = new Set<string>();
@@ -88,9 +112,7 @@ export function BracketPicksForm({ bracketRounds, initialPicks, entryId, unlocke
         if (hGame && !seen.has(hf)) { seen.add(hf); ordered.push(hGame); }
         if (aGame && !seen.has(af)) { seen.add(af); ordered.push(aGame); }
       }
-      for (const g of round.games) {
-        if (!seen.has(g.id)) ordered.push(g);
-      }
+      for (const g of round.games) if (!seen.has(g.id)) ordered.push(g);
       return ordered;
     });
   }, [mainRounds, feeders]);
