@@ -70,6 +70,31 @@ export function BracketPicksForm({ bracketRounds, initialPicks, entryId, unlocke
     return map;
   }, [mainRounds]);
 
+  // Visual sort order for each round: group games by which next-round game they feed
+  // (home feeder first, then away feeder), so feeder pairs are always adjacent.
+  // This matches the actual bracket draw order, which differs from ESPN's event ID order.
+  const sortedGames = useMemo<SerializedGame[][]>(() => {
+    return mainRounds.map((round, ri) => {
+      if (ri >= mainRounds.length - 1) return round.games;
+      const nextRound = mainRounds[ri + 1];
+      const ordered: SerializedGame[] = [];
+      const seen = new Set<string>();
+      for (const nextGame of nextRound.games) {
+        const pair = feeders.get(nextGame.id);
+        if (!pair) continue;
+        const [hf, af] = pair;
+        const hGame = round.games.find((g) => g.id === hf);
+        const aGame = round.games.find((g) => g.id === af);
+        if (hGame && !seen.has(hf)) { seen.add(hf); ordered.push(hGame); }
+        if (aGame && !seen.has(af)) { seen.add(af); ordered.push(aGame); }
+      }
+      for (const g of round.games) {
+        if (!seen.has(g.id)) ordered.push(g);
+      }
+      return ordered;
+    });
+  }, [mainRounds, feeders]);
+
   // reverseMap[gameId] = IDs of games in the next round that depend on this game's pick.
   const reverseMap = useMemo(() => {
     const map = new Map<string, string[]>();
@@ -167,6 +192,7 @@ export function BracketPicksForm({ bracketRounds, initialPicks, entryId, unlocke
 
   // Build flat list of [connector?, column] elements for each round.
   const columns = mainRounds.flatMap((round, ri) => {
+    const games = sortedGames[ri];
     const slotSize = SLOT_H * Math.pow(2, ri);
     const topOffset = (slotSize - CARD_H) / 2;
     const items = [];
@@ -174,16 +200,14 @@ export function BracketPicksForm({ bracketRounds, initialPicks, entryId, unlocke
     // SVG connector to the left of this round (except the first).
     if (ri > 0) {
       const prevSlotSize = SLOT_H * Math.pow(2, ri - 1);
-      const prevGames = mainRounds[ri - 1].games;
+      const prevSorted = sortedGames[ri - 1];
       const W = CONNECTOR_W;
       const W2 = W / 2;
 
-      // Use actual feeder positions so connectors draw to the correct games
-      // even when pairs aren't consecutive (2026 WC draw).
-      const paths = round.games.flatMap((game, gi) => {
+      const paths = games.flatMap((game, gi) => {
         const pair = feeders.get(game.id);
-        const hPos = pair ? prevGames.findIndex((g) => g.id === pair[0]) : gi * 2;
-        const aPos = pair ? prevGames.findIndex((g) => g.id === pair[1]) : gi * 2 + 1;
+        const hPos = pair ? prevSorted.findIndex((g) => g.id === pair[0]) : gi * 2;
+        const aPos = pair ? prevSorted.findIndex((g) => g.id === pair[1]) : gi * 2 + 1;
         if (hPos < 0 || aPos < 0) return [];
         const y1 = hPos * prevSlotSize + prevSlotSize / 2;
         const y2 = aPos * prevSlotSize + prevSlotSize / 2;
@@ -221,7 +245,7 @@ export function BracketPicksForm({ bracketRounds, initialPicks, entryId, unlocke
           {round.label}
         </span>
         <div className="relative" style={{ height: totalHeight }}>
-          {round.games.map((game, gi) => (
+          {games.map((game, gi) => (
             <div
               key={game.id}
               className="absolute left-0 right-0 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 overflow-hidden"
