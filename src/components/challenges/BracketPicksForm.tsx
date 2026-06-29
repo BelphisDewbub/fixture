@@ -19,6 +19,19 @@ const SLOT_H = 64;
 const CONNECTOR_W = 20;
 const HEADER_H = 28; // px reserved for round label above each column
 
+// FIFA World Cup 2026 — R32 visual bracket slot order (top→bottom) as drawn by FIFA.
+// ESPN event IDs don't match the draw slot order, so we hardcode it here.
+const FIFA_WC_2026_R32_SLOT_ORDER = [
+  "760489", "760492", // Germany/Paraguay, France/Sweden
+  "760486", "760488", // South Africa/Canada, Netherlands/Morocco
+  "760496", "760497", // Portugal/Croatia, Spain/Austria
+  "760494", "760493", // USA/Bosnia-Herzegovina, Belgium/Senegal
+  "760487", "760490", // Brazil/Japan, Ivory Coast/Norway
+  "760491", "760495", // Mexico/Ecuador, England/Congo DR
+  "760500", "760499", // Argentina/Cape Verde, Australia/Egypt
+  "760498", "760501", // Switzerland/Algeria, Colombia/Ghana
+];
+
 
 function isTbd(team: string) {
   // Catches "TBD", "Place…", and ESPN placeholders like "Round of 32 3 Winner"
@@ -71,30 +84,35 @@ export function BracketPicksForm({ bracketRounds, initialPicks, entryId, unlocke
     return map;
   }, [mainRounds]);
 
-  // Visual display order computed via a backward pass: start from the Final and work
-  // back to R32. Each round's order is derived from the already-sorted next round so
-  // that every feeder pair is adjacent — giving clean bracket connectors at every level.
+  // Visual display order for each round.
+  // R32: use the FIFA draw slot order (hardcoded — ESPN event IDs don't match draw slots).
+  // Other rounds: group by which next-round game they feed so feeder pairs stay adjacent.
   const sortedGames = useMemo<SerializedGame[][]>(() => {
-    const result: SerializedGame[][] = new Array(mainRounds.length);
-    result[mainRounds.length - 1] = [...mainRounds[mainRounds.length - 1].games];
-    for (let ri = mainRounds.length - 2; ri >= 0; ri--) {
-      const nextSorted = result[ri + 1];
-      const games = mainRounds[ri].games;
+    return mainRounds.map((round, ri) => {
+      if (round.slug === "round-of-32") {
+        const slotted = FIFA_WC_2026_R32_SLOT_ORDER
+          .map((id) => round.games.find((g) => g.id === id))
+          .filter((g): g is SerializedGame => g !== undefined);
+        const seen = new Set(slotted.map((g) => g.id));
+        for (const g of round.games) if (!seen.has(g.id)) slotted.push(g);
+        return slotted;
+      }
+      if (ri >= mainRounds.length - 1) return round.games;
+      const nextRound = mainRounds[ri + 1];
       const ordered: SerializedGame[] = [];
       const seen = new Set<string>();
-      for (const nextGame of nextSorted) {
+      for (const nextGame of nextRound.games) {
         const pair = feeders.get(nextGame.id);
         if (!pair) continue;
         const [hf, af] = pair;
-        const hGame = games.find((g) => g.id === hf);
-        const aGame = games.find((g) => g.id === af);
+        const hGame = round.games.find((g) => g.id === hf);
+        const aGame = round.games.find((g) => g.id === af);
         if (hGame && !seen.has(hf)) { seen.add(hf); ordered.push(hGame); }
         if (aGame && !seen.has(af)) { seen.add(af); ordered.push(aGame); }
       }
-      for (const g of games) if (!seen.has(g.id)) ordered.push(g);
-      result[ri] = ordered;
-    }
-    return result;
+      for (const g of round.games) if (!seen.has(g.id)) ordered.push(g);
+      return ordered;
+    });
   }, [mainRounds, feeders]);
 
   // reverseMap[gameId] = IDs of games in the next round that depend on this game's pick.
@@ -213,8 +231,9 @@ export function BracketPicksForm({ bracketRounds, initialPicks, entryId, unlocke
         if (hPos < 0 || aPos < 0) return [];
         const y1 = hPos * prevSlotSize + prevSlotSize / 2;
         const y2 = aPos * prevSlotSize + prevSlotSize / 2;
+        const midC = (y1 + y2) / 2;
         const yMid = gi * slotSize + slotSize / 2;
-        return [`M 0 ${y1} H ${W2} V ${y2} H 0 M ${W2} ${yMid} H ${W}`];
+        return [`M 0 ${y1} H ${W2} V ${y2} H 0 M ${W2} ${midC} V ${yMid} H ${W}`];
       });
 
       items.push(
