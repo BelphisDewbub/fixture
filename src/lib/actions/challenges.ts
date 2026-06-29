@@ -93,6 +93,32 @@ export async function setAdmin(
   return {};
 }
 
+export async function saveLockOverrides(
+  challengeId: string,
+  overrides: { groupPicksOpen: boolean; bracketPicksOpen: boolean },
+): Promise<{ error?: string }> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Not authenticated" };
+
+  const challenge = await prisma.challenge.findUnique({
+    where: { id: challengeId },
+    include: { entries: { select: { userId: true, isAdmin: true } } },
+  });
+  if (!challenge) return { error: "Not found" };
+
+  const myEntry = challenge.entries.find((e) => e.userId === session.user.id);
+  const isOwner = challenge.createdById === session.user.id;
+  const isAdmin = myEntry?.isAdmin ?? false;
+  if (!isOwner && !isAdmin) return { error: "Unauthorized" };
+
+  await prisma.challenge.update({
+    where: { id: challengeId },
+    data: { groupPicksOpen: overrides.groupPicksOpen, bracketPicksOpen: overrides.bracketPicksOpen },
+  });
+  revalidatePath(`/challenges/${challengeId}`);
+  return {};
+}
+
 export async function deleteChallenge(challengeId: string) {
   const session = await auth();
   if (!session?.user?.id) redirect("/api/auth/signin");

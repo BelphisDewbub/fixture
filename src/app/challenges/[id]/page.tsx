@@ -86,9 +86,10 @@ export default async function ChallengePage({ params }: Props) {
   const firstGroupGame = [...groupGames].sort(
     (a, b) => new Date(a.kickoff).getTime() - new Date(b.kickoff).getTime()
   )[0];
-  const groupPicksLocked = firstGroupGame
+  const groupPicksLockedAuto = firstGroupGame
     ? new Date(firstGroupGame.kickoff) <= now
     : false;
+  const groupPicksLocked = challenge.groupPicksOpen ? false : groupPicksLockedAuto;
 
   // When simulating, only the injected games determine lock state (ESPN bracket data has past kickoffs)
   const bracketGamesForLock = TEST_SIMULATE_RESULTS
@@ -97,10 +98,12 @@ export default async function ChallengePage({ params }: Props) {
   const firstBracketGame = [...bracketGamesForLock].sort(
     (a, b) => new Date(a.kickoff).getTime() - new Date(b.kickoff).getTime()
   )[0];
-  const bracketPicksUnlocked = groupGames.length > 0 && groupGames.every((g) => g.completed);
-  const bracketPicksLocked = firstBracketGame
+  const bracketPicksUnlockedAuto = groupGames.length > 0 && groupGames.every((g) => g.completed);
+  const bracketPicksUnlocked = challenge.bracketPicksOpen ? true : bracketPicksUnlockedAuto;
+  const bracketPicksLockedAuto = firstBracketGame
     ? new Date(firstBracketGame.kickoff) <= now
     : false;
+  const bracketPicksLocked = challenge.bracketPicksOpen ? false : bracketPicksLockedAuto;
 
   const myPicks = allPicks.filter((p) => p.entryId === myEntry.id);
   const groupPicksData = (myPicks.find((p) => p.phase === "groups")?.data ?? {}) as GroupPicksData;
@@ -160,6 +163,8 @@ export default async function ChallengePage({ params }: Props) {
             id: challenge.id,
             createdById: challenge.createdById,
             entries: challenge.entries,
+            groupPicksOpen: challenge.groupPicksOpen,
+            bracketPicksOpen: challenge.bracketPicksOpen,
           }}
           myUserId={session.user.id}
           myEntryId={myEntry.id}

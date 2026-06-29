@@ -6,6 +6,7 @@ import { InviteLinkCopy } from "@/components/InviteLinkCopy";
 import { DeleteChallengeButton } from "@/components/challenges/DeleteChallengeButton";
 import { WeightsForm } from "@/components/challenges/WeightsForm";
 import { MembersManager } from "@/components/challenges/MembersManager";
+import { LockOverridesForm } from "@/components/challenges/LockOverridesForm";
 import { GroupPicksForm } from "@/components/challenges/GroupPicksForm";
 import { BracketPicksForm } from "@/components/challenges/BracketPicksForm";
 import { Leaderboard } from "@/components/challenges/Leaderboard";
@@ -29,6 +30,8 @@ interface ChallengeInfo {
   id: string;
   createdById: string;
   entries: Entry[];
+  groupPicksOpen: boolean;
+  bracketPicksOpen: boolean;
 }
 
 export interface PlayerPicksRow {
@@ -292,6 +295,11 @@ export function ChallengeTabs({
           {isOwner && (
             <WeightsForm challengeId={challenge.id} initialWeights={weights} />
           )}
+          <LockOverridesForm
+            challengeId={challenge.id}
+            initialGroupPicksOpen={challenge.groupPicksOpen}
+            initialBracketPicksOpen={challenge.bracketPicksOpen}
+          />
           <MembersManager
             challengeId={challenge.id}
             members={challenge.entries.map((e) => ({
