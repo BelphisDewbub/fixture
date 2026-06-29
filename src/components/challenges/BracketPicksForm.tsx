@@ -86,9 +86,10 @@ export function BracketPicksForm({ bracketRounds, initialPicks, entryId, unlocke
 
   // Visual display order for each round.
   // R32: hardcoded FIFA draw slot order.
-  // Later rounds: sorted by average visual position of their feeder games in the
-  // previous sorted round, so each game card appears near the centre of the two R32
-  // games (or R16 games, etc.) that flow into it.
+  // Later rounds: sorted by the topmost (minimum) visual position of either feeder
+  // game in the previous sorted round. This keeps Germany's R16 game first (since
+  // Germany is R32 slot 0), France's second (slot 1), etc. — regardless of who
+  // each team's actual R16 opponent is.
   const sortedGames = useMemo<SerializedGame[][]>(() => {
     const result: SerializedGame[][] = new Array(mainRounds.length);
     for (let ri = 0; ri < mainRounds.length; ri++) {
@@ -104,14 +105,6 @@ export function BracketPicksForm({ bracketRounds, initialPicks, entryId, unlocke
       }
       if (ri === 0 || !result[ri - 1]) { result[ri] = [...round.games]; continue; }
       const prevSorted = result[ri - 1];
-      const avgPos = (game: SerializedGame): number => {
-        const pair = feeders.get(game.id);
-        if (!pair) return Infinity;
-        const positions = [pair[0], pair[1]]
-          .map((id) => prevSorted.findIndex((g) => g.id === id))
-          .filter((p) => p >= 0);
-        return positions.length ? positions.reduce((s, p) => s + p, 0) / positions.length : Infinity;
-      };
       const minPos = (game: SerializedGame): number => {
         const pair = feeders.get(game.id);
         if (!pair) return Infinity;
@@ -120,10 +113,7 @@ export function BracketPicksForm({ bracketRounds, initialPicks, entryId, unlocke
           .filter((p) => p >= 0);
         return positions.length ? Math.min(...positions) : Infinity;
       };
-      result[ri] = [...round.games].sort((a, b) => {
-        const diff = avgPos(a) - avgPos(b);
-        return diff !== 0 ? diff : minPos(a) - minPos(b);
-      });
+      result[ri] = [...round.games].sort((a, b) => minPos(a) - minPos(b));
     }
     return result;
   }, [mainRounds, feeders]);
@@ -244,9 +234,8 @@ export function BracketPicksForm({ bracketRounds, initialPicks, entryId, unlocke
         if (hPos < 0 || aPos < 0) return [];
         const y1 = hPos * prevSlotSize + prevSlotSize / 2;
         const y2 = aPos * prevSlotSize + prevSlotSize / 2;
-        const midC = (y1 + y2) / 2;
         const yMid = gi * slotSize + slotSize / 2;
-        return [`M 0 ${y1} H ${W2} V ${y2} H 0 M ${W2} ${midC} V ${yMid} H ${W}`];
+        return [`M 0 ${y1} H ${W2} V ${y2} H 0 M ${W2} ${yMid} H ${W}`];
       });
 
       items.push(
