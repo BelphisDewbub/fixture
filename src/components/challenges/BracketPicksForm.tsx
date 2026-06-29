@@ -85,34 +85,47 @@ export function BracketPicksForm({ bracketRounds, initialPicks, entryId, unlocke
   }, [mainRounds]);
 
   // Visual display order for each round.
-  // R32: use the FIFA draw slot order (hardcoded — ESPN event IDs don't match draw slots).
-  // Other rounds: group by which next-round game they feed so feeder pairs stay adjacent.
+  // R32: hardcoded FIFA draw slot order.
+  // Later rounds: sorted by average visual position of their feeder games in the
+  // previous sorted round, so each game card appears near the centre of the two R32
+  // games (or R16 games, etc.) that flow into it.
   const sortedGames = useMemo<SerializedGame[][]>(() => {
-    return mainRounds.map((round, ri) => {
+    const result: SerializedGame[][] = new Array(mainRounds.length);
+    for (let ri = 0; ri < mainRounds.length; ri++) {
+      const round = mainRounds[ri];
       if (round.slug === "round-of-32") {
         const slotted = FIFA_WC_2026_R32_SLOT_ORDER
           .map((id) => round.games.find((g) => g.id === id))
           .filter((g): g is SerializedGame => g !== undefined);
         const seen = new Set(slotted.map((g) => g.id));
         for (const g of round.games) if (!seen.has(g.id)) slotted.push(g);
-        return slotted;
+        result[ri] = slotted;
+        continue;
       }
-      if (ri >= mainRounds.length - 1) return round.games;
-      const nextRound = mainRounds[ri + 1];
-      const ordered: SerializedGame[] = [];
-      const seen = new Set<string>();
-      for (const nextGame of nextRound.games) {
-        const pair = feeders.get(nextGame.id);
-        if (!pair) continue;
-        const [hf, af] = pair;
-        const hGame = round.games.find((g) => g.id === hf);
-        const aGame = round.games.find((g) => g.id === af);
-        if (hGame && !seen.has(hf)) { seen.add(hf); ordered.push(hGame); }
-        if (aGame && !seen.has(af)) { seen.add(af); ordered.push(aGame); }
-      }
-      for (const g of round.games) if (!seen.has(g.id)) ordered.push(g);
-      return ordered;
-    });
+      if (ri === 0 || !result[ri - 1]) { result[ri] = [...round.games]; continue; }
+      const prevSorted = result[ri - 1];
+      const avgPos = (game: SerializedGame): number => {
+        const pair = feeders.get(game.id);
+        if (!pair) return Infinity;
+        const positions = [pair[0], pair[1]]
+          .map((id) => prevSorted.findIndex((g) => g.id === id))
+          .filter((p) => p >= 0);
+        return positions.length ? positions.reduce((s, p) => s + p, 0) / positions.length : Infinity;
+      };
+      const minPos = (game: SerializedGame): number => {
+        const pair = feeders.get(game.id);
+        if (!pair) return Infinity;
+        const positions = [pair[0], pair[1]]
+          .map((id) => prevSorted.findIndex((g) => g.id === id))
+          .filter((p) => p >= 0);
+        return positions.length ? Math.min(...positions) : Infinity;
+      };
+      result[ri] = [...round.games].sort((a, b) => {
+        const diff = avgPos(a) - avgPos(b);
+        return diff !== 0 ? diff : minPos(a) - minPos(b);
+      });
+    }
+    return result;
   }, [mainRounds, feeders]);
 
   // reverseMap[gameId] = IDs of games in the next round that depend on this game's pick.
